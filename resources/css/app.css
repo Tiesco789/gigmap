@@ -1,11 +1,232 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* ============================================================
+   GigMap Design System – TailwindCSS v4
+   ============================================================ */
+
+@layer base {
+    html { scroll-behavior: smooth; }
+
+    body {
+        background-color: #111111;
+        color: #F5F5DC;
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        min-height: 100vh;
+    }
 }
+
+@layer components {
+    /* ── Buttons ─────────────────────────────────────── */
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        background-color: #F59E0B;
+        color: #111111;
+        font-weight: 700;
+        font-size: 0.875rem;
+        border-radius: 0.25rem;
+        border: 2px solid #F59E0B;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .btn-primary:hover {
+        background-color: #D97706;
+        border-color: #D97706;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    }
+
+    .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        background-color: transparent;
+        color: #F5F5DC;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-radius: 0.25rem;
+        border: 1.5px solid #F5F5DC;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .btn-outline:hover {
+        background-color: rgba(245, 245, 220, 0.08);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-gold {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        background-color: transparent;
+        color: #F59E0B;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border-radius: 0.25rem;
+        border: 1.5px solid #F59E0B;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .btn-outline-gold:hover {
+        background-color: rgba(245, 158, 11, 0.08);
+    }
+
+    /* ── Inputs ──────────────────────────────────────── */
+    .input-field {
+        width: 100%;
+        padding: 0.6rem 0.875rem;
+        background-color: #111111;
+        color: #F5F5DC;
+        border: 1.5px solid #F59E0B;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        outline: none;
+        transition: box-shadow 0.2s ease;
+    }
+    .input-field::placeholder { color: #6B7280; }
+    .input-field:focus { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18); }
+
+    .input-subtle {
+        width: 100%;
+        padding: 0.6rem 0.875rem;
+        background-color: #1a1a1a;
+        color: #F5F5DC;
+        border: 1.5px solid #333333;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+    .input-subtle::placeholder { color: #6B7280; }
+    .input-subtle:focus { border-color: #F59E0B; }
+
+    /* ── Cards ───────────────────────────────────────── */
+    .card-announcement {
+        background-color: #111111;
+        border: 1px solid #2a2a2a;
+        border-radius: 0.375rem;
+        overflow: hidden;
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-announcement:hover {
+        transform: translateY(-3px);
+        border-color: #F59E0B;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Navigation ──────────────────────────────────── */
+    .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background-color: rgba(17, 17, 17, 0.95);
+        border-bottom: 1px solid #2a2a2a;
+        backdrop-filter: blur(8px);
+    }
+
+    /* ── Tabs ────────────────────────────────────────── */
+    .tab-link {
+        padding-bottom: 0.375rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #9CA3AF;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .tab-link.active,
+    .tab-link:hover {
+        color: #F59E0B;
+        border-bottom-color: #F59E0B;
+    }
+
+    /* ── Genre pills ─────────────────────────────────── */
+    .genre-pill {
+        padding: 0.4rem 1.1rem;
+        border-radius: 0.25rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: #F5F5DC;
+        border: 1px solid #333333;
+        background: transparent;
+    }
+    .genre-pill:hover, .genre-pill.active {
+        background-color: #F59E0B;
+        color: #111111;
+        border-color: #F59E0B;
+    }
+
+    /* ── Form sections (profile pages) ──────────────── */
+    .form-section {
+        border-top: 1px solid #2a2a2a;
+        padding: 1.5rem 0;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .form-section-label {
+        color: #9CA3AF;
+        font-size: 0.875rem;
+        padding-top: 0.5rem;
+    }
+
+    /* ── Alert/flash ─────────────────────────────────── */
+    .alert-success {
+        padding: 0.875rem 1rem;
+        background-color: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 0.375rem;
+        color: #86efac;
+        font-size: 0.875rem;
+    }
+
+    .alert-error {
+        padding: 0.875rem 1rem;
+        background-color: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 0.375rem;
+        color: #fca5a5;
+        font-size: 0.875rem;
+    }
+}
+
+/* ── Animations ──────────────────────────────────────── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.animate-fade-in-up { animation: fadeInUp 0.55s ease both; }
+.animate-fade-in    { animation: fadeIn 0.4s ease both; }
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
