@@ -2,10 +2,8 @@
     <div class="max-w-6xl mx-auto px-6 py-12">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             {{-- Logo --}}
-            <a href="{{ route('home') }}">
-                <span class="text-3xl font-black" style="font-family:'IM Fell English',serif;color:#F5F5DC;">
-                    G<span style="color:#F59E0B;">i</span>G<span style="font-size:0.85em;"> M</span>a<span style="font-size:0.85em;">p</span>
-                </span>
+            <a href="{{ route('home') }}" class="flex-shrink-0">
+                <img src="{{ asset('assets/logo-gigmap.svg') }}" width="120" />
             </a>
 
             {{-- Nav --}}

@@ -18,9 +18,7 @@
     <div class="max-w-6xl mx-auto px-6 flex items-center h-14 gap-8">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="flex-shrink-0">
-            <span class="text-2xl font-black tracking-tight" style="font-family:'IM Fell English',serif;color:#F5F5DC;">
-                G<span style="color:#F59E0B;">i</span>G<span style="font-size:0.85em;"> M</span>a<span style="font-size:0.85em;">p</span>
-            </span>
+            <img src="{{ asset('assets/logo-gigmap.svg') }}" width="120"  />
         </a>
 
         {{-- Nav links --}}
@@ -50,10 +48,10 @@
             </button>
 
             {{-- Avatar dropdown --}}
-            <div class="relative" x-data="{ open: false }">
+            {{-- <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" class="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-500 flex items-center justify-center"
                     style="background:#2a2a2a;">
-                    @if(auth()->user()->avatar)
+                    @if(auth()->user()->avatar && auth()->user()->avatar->exists())
                         <img src="{{ auth()->user()->getAvatarUrl() }}" alt="Avatar" class="w-full h-full object-cover">
                     @else
                         <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
@@ -78,7 +76,7 @@
                         </button>
                     </form>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 </nav>

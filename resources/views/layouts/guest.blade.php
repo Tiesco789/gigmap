@@ -18,10 +18,9 @@
     <div class="max-w-6xl mx-auto px-6 flex items-center h-14 gap-8">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="flex-shrink-0">
-            <span class="text-2xl font-black tracking-tight" style="font-family:'IM Fell English',serif;color:#F5F5DC;">
-                G<span style="color:#F59E0B;">i</span>G<span style="font-size:0.85em;"> M</span>a<span style="font-size:0.85em;">p</span>
-            </span>
+            <img src="{{ asset('assets/logo-gigmap.svg') }}" width="120"  />
         </a>
+
 
         {{-- Nav links --}}
         <div class="hidden md:flex items-center gap-7 flex-1">

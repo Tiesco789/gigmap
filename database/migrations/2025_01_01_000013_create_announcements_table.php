@@ -22,11 +22,11 @@ return new class extends Migration
         });
 
         // Add PostGIS geography column for spatial queries
-        try {
-            DB::statement('ALTER TABLE announcements ADD COLUMN coordinates geography(Point, 4326)');
-        } catch (\Exception $e) {
-            // PostGIS may not be available – continue without spatial column
-        }
+        // try {
+        //     DB::statement('ALTER TABLE announcements ADD COLUMN coordinates geography(Point, 4326)');
+        // } catch (\Exception $e) {
+        //     // PostGIS may not be available – continue without spatial column
+        // }
     }
 
     public function down(): void

@@ -16,10 +16,9 @@
 <nav class="navbar">
     <div class="max-w-6xl mx-auto px-6 flex items-center h-14 gap-8">
         <a href="{{ route('home') }}" class="flex-shrink-0">
-            <span style="font-family:'IM Fell English',serif;font-size:1.5rem;font-weight:900;color:#F5F5DC;letter-spacing:0.02em;">
-                G<span style="color:#F59E0B;">i</span>G<span style="font-size:0.8em;"> M</span>a<span style="font-size:0.8em;">p</span>
-            </span>
+            <img src="{{ asset('assets/logo-gigmap.svg') }}" width="120"  />
         </a>
+
         <div class="hidden md:flex items-center gap-7 flex-1">
             <a href="{{ route('announcements.index') }}" class="btn-ghost text-sm">Anúncios</a>
             <a href="#quem-somos" class="btn-ghost text-sm">Quem Somos</a>
