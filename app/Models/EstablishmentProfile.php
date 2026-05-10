@@ -16,6 +16,7 @@ class EstablishmentProfile extends Model
         'city',
         'cep',
         'address',
+        'number',
         'about',
     ];
 

@@ -25,7 +25,18 @@ class AnnouncementController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'ilike', "%{$search}%")
                   ->orWhere('description', 'ilike', "%{$search}%")
-                  ->orWhere('location', 'ilike', "%{$search}%");
+                  ->orWhere('location', 'ilike', "%{$search}%")
+                  ->orWhere('genre', 'ilike', "%{$search}%")
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('name', 'ilike', "%{$search}%");
+                  })
+                  ->orWhereHas('user.musicianProfile', function ($mq) use ($search) {
+                      $mq->where('first_name', 'ilike', "%{$search}%")
+                         ->orWhere('last_name', 'ilike', "%{$search}%");
+                  })
+                  ->orWhereHas('user.establishmentProfile', function ($eq) use ($search) {
+                      $eq->where('establishment_name', 'ilike', "%{$search}%");
+                  });
             });
         }
 

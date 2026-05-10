@@ -18,6 +18,7 @@ class User extends Authenticatable
         'password',
         'type',
         'avatar',
+        'social_links',
     ];
 
     protected $hidden = [
@@ -30,6 +31,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'social_links' => 'array',
         ];
     }
 
@@ -56,6 +58,11 @@ class User extends Authenticatable
     public function reviewsGiven(): HasMany
     {
         return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    public function proposals(): HasMany
+    {
+        return $this->hasMany(Proposal::class, 'sender_id');
     }
 
     public function isMusician(): bool

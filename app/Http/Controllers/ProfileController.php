@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -9,6 +10,12 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
+    public function show(User $user)
+    {
+        $user->load(['musicianProfile', 'establishmentProfile', 'announcements', 'reviewsReceived.reviewer']);
+        return view('profile.show', compact('user'));
+    }
+
     public function edit()
     {
         $user = Auth::user()->load(['musicianProfile', 'establishmentProfile']);
@@ -29,6 +36,13 @@ class ProfileController extends Controller
             'city'             => 'nullable|string|max:255',
             'cep'              => 'nullable|string|max:20',
             'address'          => 'nullable|string|max:255',
+            // Social links
+            'social_instagram' => 'nullable|url|max:255',
+            'social_spotify'   => 'nullable|url|max:255',
+            'social_youtube'   => 'nullable|url|max:255',
+            'social_website'   => 'nullable|url|max:255',
+            'social_linktree'  => 'nullable|url|max:255',
+            'social_other'     => 'nullable|url|max:255',
         ];
 
         if ($user->isMusician()) {
@@ -38,6 +52,7 @@ class ProfileController extends Controller
             $rules['establishment_name'] = 'nullable|string|max:255';
             $rules['cnpj']               = 'nullable|string|max:20';
             $rules['website']            = 'nullable|url|max:255';
+            $rules['number']             = 'nullable|string|max:20';
         }
 
         $validated = $request->validate($rules);
@@ -58,6 +73,17 @@ class ProfileController extends Controller
             }
             $user->password = Hash::make($request->new_password);
         }
+
+        // Handle social links
+        $socialLinks = array_filter([
+            'instagram' => $validated['social_instagram'] ?? null,
+            'spotify'   => $validated['social_spotify'] ?? null,
+            'youtube'   => $validated['social_youtube'] ?? null,
+            'website'   => $validated['social_website'] ?? null,
+            'linktree'  => $validated['social_linktree'] ?? null,
+            'other'     => $validated['social_other'] ?? null,
+        ]);
+        $user->social_links = !empty($socialLinks) ? $socialLinks : null;
 
         $user->email = $validated['email'];
         $user->save();
@@ -87,6 +113,7 @@ class ProfileController extends Controller
                 'city'               => $validated['city'] ?? $profile->city,
                 'cep'                => $validated['cep'] ?? $profile->cep,
                 'address'            => $validated['address'] ?? $profile->address,
+                'number'             => $validated['number'] ?? $profile->number,
             ]);
             $user->name = $validated['establishment_name'] ?? $profile->establishment_name;
             $user->save();
@@ -95,3 +122,4 @@ class ProfileController extends Controller
         return back()->with('success', 'Perfil atualizado com sucesso!');
     }
 }
+

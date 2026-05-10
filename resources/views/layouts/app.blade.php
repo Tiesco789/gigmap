@@ -7,7 +7,7 @@
     <meta name="description" content="@yield('meta_description', 'GigMap conecta músicos e estabelecimentos, facilitando a descoberta de artistas locais e a contratação para apresentações ao vivo.')">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
@@ -40,18 +40,32 @@
                 </div>
             </form>
 
-            {{-- Bell --}}
-            <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors">
-                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                </svg>
-            </button>
+            {{-- Bell (notifications) --}}
+            <div class="relative" id="notificationWrapper">
+                <button id="notificationBell" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors relative">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                    <span id="notificationBadge" class="hidden absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center" style="background:#ef4444;color:#fff;"></span>
+                </button>
+
+                {{-- Notification dropdown --}}
+                <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 rounded-md shadow-xl z-50 overflow-hidden" style="background:#1c1c1c; border:1px solid #333;">
+                    <div class="flex items-center justify-between px-4 py-3" style="border-bottom:1px solid #333;">
+                        <span class="text-sm font-bold" style="color:#F59E0B;">Notificações</span>
+                        <button id="markAllReadBtn" class="text-xs hover:underline" style="color:#F59E0B;">Marcar todas como lidas</button>
+                    </div>
+                    <div id="notificationList" class="max-h-72 overflow-y-auto">
+                        <div class="px-4 py-6 text-center text-sm" style="color:#9CA3AF;">Carregando...</div>
+                    </div>
+                </div>
+            </div>
 
             {{-- Avatar dropdown --}}
-            {{-- <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open" class="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-500 flex items-center justify-center"
+            <div class="relative" id="avatarWrapper">
+                <button id="avatarBtn" class="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-500 flex items-center justify-center"
                     style="background:#2a2a2a;">
-                    @if(auth()->user()->avatar && auth()->user()->avatar->exists())
+                    @if(auth()->user()->avatar)
                         <img src="{{ auth()->user()->getAvatarUrl() }}" alt="Avatar" class="w-full h-full object-cover">
                     @else
                         <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
@@ -59,11 +73,13 @@
                         </svg>
                     @endif
                 </button>
-                <div x-show="open" @click.away="open = false"
-                    class="absolute right-0 mt-2 w-44 rounded-md shadow-xl py-1 z-50"
-                    style="background:#1c1c1c; border:1px solid #333;" x-cloak>
+                <div id="avatarMenu" class="hidden absolute right-0 mt-2 w-44 rounded-md shadow-xl py-1 z-50"
+                    style="background:#1c1c1c; border:1px solid #333;">
                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-colors">
                         Meu Perfil
+                    </a>
+                    <a href="{{ route('profile.show', auth()->user()) }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-colors">
+                        Perfil Público
                     </a>
                     <a href="{{ route('announcements.create') }}" class="block px-4 py-2 text-sm text-gray-300 hover:text-amber-400 hover:bg-white/5 transition-colors">
                         Criar Anúncio
@@ -76,7 +92,7 @@
                         </button>
                     </form>
                 </div>
-            </div> --}}
+            </div>
         </div>
     </div>
 </nav>
@@ -109,20 +125,118 @@
 
 @stack('scripts')
 <script>
-// Simple alpine-like dropdown toggle for vanilla JS
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[x-data]').forEach(el => {
-        const btn = el.querySelector('[\\@click]');
-        const menu = el.querySelector('[x-show]');
-        if (!btn || !menu) return;
-        menu.style.display = 'none';
-        btn.addEventListener('click', () => {
-            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    // ─── Avatar dropdown toggle ───
+    const avatarBtn = document.getElementById('avatarBtn');
+    const avatarMenu = document.getElementById('avatarMenu');
+    if (avatarBtn && avatarMenu) {
+        avatarBtn.addEventListener('click', () => {
+            avatarMenu.classList.toggle('hidden');
+            // Close notification dropdown when opening avatar
+            document.getElementById('notificationDropdown')?.classList.add('hidden');
         });
-        document.addEventListener('click', (e) => {
-            if (!el.contains(e.target)) menu.style.display = 'none';
+    }
+
+    // ─── Notification bell ───
+    const bell = document.getElementById('notificationBell');
+    const dropdown = document.getElementById('notificationDropdown');
+    const badge = document.getElementById('notificationBadge');
+    const list = document.getElementById('notificationList');
+    const markAllBtn = document.getElementById('markAllReadBtn');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+        || '{{ csrf_token() }}';
+
+    function loadNotifications() {
+        fetch('/notificacoes', { headers: { 'Accept': 'application/json' } })
+            .then(r => r.json())
+            .then(data => {
+                // Update badge
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count > 9 ? '9+' : data.unread_count;
+                    badge.classList.remove('hidden');
+                    badge.classList.add('flex');
+                } else {
+                    badge.classList.add('hidden');
+                    badge.classList.remove('flex');
+                }
+
+                // Render notifications
+                if (data.notifications.length === 0) {
+                    list.innerHTML = '<div class="px-4 py-6 text-center text-sm" style="color:#9CA3AF;">Nenhuma notificação</div>';
+                    return;
+                }
+
+                list.innerHTML = data.notifications.map(n => {
+                    const isUnread = !n.read_at;
+                    const d = n.data;
+                    return `
+                        <div class="px-4 py-3 cursor-pointer transition-colors hover:bg-white/5 ${isUnread ? '' : 'opacity-60'}"
+                            style="border-bottom:1px solid #2a2a2a;"
+                            data-notification-id="${n.id}"
+                            ${isUnread ? 'data-unread="true"' : ''}>
+                            <p class="text-sm font-semibold mb-0.5" style="color:#F59E0B;">${d.sender_name}</p>
+                            <p class="text-xs mb-1" style="color:#d1d5db;">
+                                Enviou uma proposta para <strong>${d.announcement_title}</strong>
+                            </p>
+                            ${d.message ? `<p class="text-xs line-clamp-2" style="color:#9CA3AF;">"${d.message}"</p>` : ''}
+                            <p class="text-xs mt-1" style="color:#666;">${n.time_ago}</p>
+                        </div>
+                    `;
+                }).join('');
+
+                // Click on notification → mark as read & go to announcement
+                list.querySelectorAll('[data-notification-id]').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const id = el.dataset.notificationId;
+                        const announcementId = data.notifications.find(n => n.id === id)?.data.announcement_id;
+                        if (el.dataset.unread) {
+                            fetch(`/notificacoes/${id}/lida`, {
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                            });
+                        }
+                        if (announcementId) {
+                            window.location.href = `/anuncios/${announcementId}`;
+                        }
+                    });
+                });
+            })
+            .catch(() => {
+                list.innerHTML = '<div class="px-4 py-6 text-center text-sm" style="color:#9CA3AF;">Erro ao carregar</div>';
+            });
+    }
+
+    if (bell && dropdown) {
+        bell.addEventListener('click', () => {
+            const isHidden = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden');
+            avatarMenu?.classList.add('hidden');
+            if (isHidden) loadNotifications();
         });
+    }
+
+    // Mark all as read
+    if (markAllBtn) {
+        markAllBtn.addEventListener('click', () => {
+            fetch('/notificacoes/todas-lidas', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+            }).then(() => loadNotifications());
+        });
+    }
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', (e) => {
+        if (!document.getElementById('notificationWrapper')?.contains(e.target)) {
+            dropdown?.classList.add('hidden');
+        }
+        if (!document.getElementById('avatarWrapper')?.contains(e.target)) {
+            avatarMenu?.classList.add('hidden');
+        }
     });
+
+    // Load badge count on page load
+    loadNotifications();
 });
 </script>
 </body>

@@ -17,8 +17,12 @@
     body {
         background-color: #111111;
         color: #F5F5DC;
-        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+        font-family: 'Merriweather', Georgia, 'Times New Roman', serif;
         min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
     }
 }
 
@@ -281,4 +285,23 @@
 
 .delay-400 {
     animation-delay: 0.4s;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 640px) {
+    .form-section {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .form-section-label {
+        padding-top: 0;
+        font-weight: 600;
+        color: #F59E0B;
+    }
+
+    .navbar .max-w-6xl {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 }

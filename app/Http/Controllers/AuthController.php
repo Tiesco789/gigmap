@@ -27,6 +27,7 @@ class AuthController extends Controller
                 'last_name'  => 'required|string|max:255',
                 'email'      => 'required|email|unique:users,email',
                 'password'   => 'required|string|min:8|confirmed',
+                'avatar'     => 'nullable|image|max:2048',
                 'state'      => 'nullable|string|max:255',
                 'city'       => 'nullable|string|max:255',
                 'cep'        => 'nullable|string|max:20',
@@ -39,6 +40,13 @@ class AuthController extends Controller
                 'password' => Hash::make($validated['password']),
                 'type'     => 'musician',
             ]);
+
+            // Handle avatar upload
+            if ($request->hasFile('avatar')) {
+                $path = $request->file('avatar')->store('avatars', 'public');
+                $user->avatar = $path;
+                $user->save();
+            }
 
             MusicianProfile::create([
                 'user_id'    => $user->id,
@@ -56,6 +64,12 @@ class AuthController extends Controller
                 'website'            => 'nullable|url|max:255',
                 'email'              => 'required|email|unique:users,email',
                 'password'           => 'required|string|min:8|confirmed',
+                'avatar'             => 'nullable|image|max:2048',
+                'state'              => 'nullable|string|max:255',
+                'city'               => 'nullable|string|max:255',
+                'cep'                => 'nullable|string|max:20',
+                'address'            => 'nullable|string|max:255',
+                'number'             => 'nullable|string|max:20',
             ]);
 
             $user = User::create([
@@ -65,11 +79,23 @@ class AuthController extends Controller
                 'type'     => 'establishment',
             ]);
 
+            // Handle avatar upload
+            if ($request->hasFile('avatar')) {
+                $path = $request->file('avatar')->store('avatars', 'public');
+                $user->avatar = $path;
+                $user->save();
+            }
+
             EstablishmentProfile::create([
                 'user_id'            => $user->id,
                 'establishment_name' => $validated['establishment_name'],
                 'cnpj'               => $validated['cnpj'] ?? null,
                 'website'            => $validated['website'] ?? null,
+                'state'              => $validated['state'] ?? null,
+                'city'               => $validated['city'] ?? null,
+                'cep'                => $validated['cep'] ?? null,
+                'address'            => $validated['address'] ?? null,
+                'number'             => $validated['number'] ?? null,
             ]);
         }
 
