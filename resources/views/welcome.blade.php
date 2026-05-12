@@ -46,16 +46,32 @@
                 <p class="text-base mb-8" style="color:#9CA3AF;">
                     Encontre oportunidades, agende apresentações e fortaleça sua presença na cena musical.
                 </p>
-                <form action="{{ route('register') }}" class="flex flex-col sm:flex-row gap-3 max-w-md">
+                @if(session('success'))
+                <div class="rounded-lg px-4 py-3 mb-4 text-sm font-medium" style="background:rgba(16,185,129,0.15);color:#10B981;border:1px solid rgba(16,185,129,0.3);">
+                    ✓ {{ session('success') }}
+                </div>
+                @endif
+                @if(session('error'))
+                <div class="rounded-lg px-4 py-3 mb-4 text-sm font-medium" style="background:rgba(239,68,68,0.15);color:#EF4444;border:1px solid rgba(239,68,68,0.3);">
+                    ✗ {{ session('error') }}
+                </div>
+                @endif
+                @if($errors->has('email'))
+                <div class="rounded-lg px-4 py-3 mb-4 text-sm font-medium" style="background:rgba(239,68,68,0.15);color:#EF4444;border:1px solid rgba(239,68,68,0.3);">
+                    ✗ {{ $errors->first('email') }}
+                </div>
+                @endif
+                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex flex-col sm:flex-row gap-3 max-w-md">
+                    @csrf
                     <div class="relative flex-1">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2">
                             <svg class="w-4 h-4" style="color:#9CA3AF;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
                         </span>
-                        <input type="email" placeholder="Digite seu e-mail" class="input-field pl-9">
+                        <input type="email" name="email" placeholder="Digite seu e-mail" class="input-field pl-9" required>
                     </div>
-                    <button type="submit" class="btn-primary flex-shrink-0">Começar agora</button>
+                    <button type="submit" class="btn-primary flex-shrink-0">Assinar newsletter</button>
                 </form>
                 <p class="text-xs mt-3" style="color:#555;">
                     Ao criar uma conta, você confirma que aceita nossos
@@ -167,7 +183,7 @@
         $mosaicPhotos = [
             ['id' => 'photo-1493225457124-a3eb161ffa5f', 'alt' => 'Guitarrista no palco',        'span' => 'col-span-2'],
             ['id' => 'photo-1598488035139-bdbb2231ce04', 'alt' => 'Microfone em destaque',        'span' => ''],
-            ['id' => 'photo-1459749411175-04bf5292ceea', 'alt' => 'Show de luzes',                'span' => 'row-span-2'],
+            ['id' => 'photo-1459749411175-04bf5292ceea', 'alt' => 'Show de luzes',                'span' => 'row-span-3'],
             ['id' => 'photo-1470225620780-dba8ba36b745', 'alt' => 'DJ mixando',                   'span' => ''],
             ['id' => 'photo-1516450360452-9312f5e86fc7', 'alt' => 'Público em festival',          'span' => 'col-span-2'],
             ['id' => 'photo-1506157786151-b8491531f063', 'alt' => 'Concerto ao vivo',             'span' => ''],
