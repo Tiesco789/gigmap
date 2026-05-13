@@ -33,6 +33,46 @@ Route::middleware('auth')->group(function () {
 // Public profile (no auth required – shareable link)
 Route::get('/perfil/{user}', [ProfileController::class, 'show'])->name('profile.show');
 
+// Search autocomplete (auth required)
+Route::middleware('auth')->group(function () {
+    Route::get('/api/buscar', function (\Illuminate\Http\Request $request) {
+        $q = $request->query('q', '');
+        if (mb_strlen($q) < 3) {
+            return response()->json([]);
+        }
+
+        $users = \App\Models\User::where(function ($query) use ($q) {
+                $query->where('name', 'ilike', "%{$q}%")
+                      ->orWhereHas('musicianProfile', function ($mq) use ($q) {
+                          $mq->where('first_name', 'ilike', "%{$q}%")
+                             ->orWhere('last_name', 'ilike', "%{$q}%");
+                      })
+                      ->orWhereHas('establishmentProfile', function ($eq) use ($q) {
+                          $eq->where('establishment_name', 'ilike', "%{$q}%");
+                      });
+            })
+            ->with(['musicianProfile', 'establishmentProfile'])
+            ->limit(8)
+            ->get()
+            ->map(function ($user) {
+                $isMusician = $user->type === 'musician';
+                return [
+                    'id'       => $user->id,
+                    'name'     => $user->getDisplayName(),
+                    'avatar'   => $user->getAvatarUrl(),
+                    'type'     => $isMusician ? 'musician' : 'establishment',
+                    'label'    => $isMusician ? 'Músico' : 'Estabelecimento',
+                    'subtitle' => $isMusician
+                        ? $user->musicianProfile?->city
+                        : $user->establishmentProfile?->city ?? $user->establishmentProfile?->address,
+                    'url'      => route('profile.show', $user),
+                ];
+            });
+
+        return response()->json($users);
+    })->name('api.search');
+});
+
 // Announcements (auth required for all)
 Route::middleware('auth')->group(function () {
     Route::get('/anuncios', [AnnouncementController::class, 'index'])->name('announcements.index');

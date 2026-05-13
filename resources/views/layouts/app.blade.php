@@ -30,13 +30,19 @@
 
         {{-- Search + user menu --}}
         <div class="flex items-center gap-3 ml-auto">
-            <form action="{{ route('announcements.index') }}" method="GET" class="hidden md:flex items-center">
+            <form action="{{ route('announcements.index') }}" method="GET" class="hidden md:flex items-center relative" id="searchForm" autocomplete="off">
                 <div class="flex items-center border border-amber-500 rounded px-3 py-1.5 gap-2" style="background:#1a1a1a;">
                     <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search"
-                        class="bg-transparent text-sm text-gray-200 outline-none w-40 placeholder-gray-500">
+                    <input type="text" name="search" id="searchInput" value="{{ request('search') }}" placeholder="Buscar..."
+                        class="bg-transparent text-sm text-gray-200 outline-none w-40 placeholder-gray-500" autocomplete="off">
+                </div>
+
+                {{-- Autocomplete dropdown --}}
+                <div id="searchDropdown" class="hidden absolute left-0 right-0 mt-1 rounded-lg shadow-2xl z-[60] overflow-hidden"
+                    style="background:#1c1c1c; border:1px solid #333; top:100%; min-width:280px;">
+                    <div id="searchResults"></div>
                 </div>
             </form>
 
@@ -233,10 +239,150 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!document.getElementById('avatarWrapper')?.contains(e.target)) {
             avatarMenu?.classList.add('hidden');
         }
+        if (!document.getElementById('searchForm')?.contains(e.target)) {
+            document.getElementById('searchDropdown')?.classList.add('hidden');
+        }
     });
 
     // Load badge count on page load
     loadNotifications();
+
+    // ─── Search Autocomplete ───
+    const searchInput    = document.getElementById('searchInput');
+    const searchDropdown = document.getElementById('searchDropdown');
+    const searchResults  = document.getElementById('searchResults');
+
+    if (searchInput && searchDropdown && searchResults) {
+        let debounceTimer = null;
+        let abortController = null;
+        let activeIndex = -1;
+
+        function showDropdown() { searchDropdown.classList.remove('hidden'); }
+        function hideDropdown() { searchDropdown.classList.add('hidden'); activeIndex = -1; }
+
+        function highlightItem(index) {
+            const items = searchResults.querySelectorAll('[data-ac-item]');
+            items.forEach((el, i) => {
+                el.style.background = i === index ? 'rgba(245,158,11,0.12)' : 'transparent';
+            });
+            activeIndex = index;
+        }
+
+        function renderResults(musicians) {
+            if (musicians.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="px-4 py-5 text-center">
+                        <svg class="w-8 h-8 mx-auto mb-2" style="color:#555;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <p class="text-sm" style="color:#9CA3AF;">Nenhum resultado encontrado</p>
+                    </div>`;
+                showDropdown();
+                return;
+            }
+
+            const badgeColor = (type) => type === 'musician'
+                ? 'background:rgba(245,158,11,0.15);color:#F59E0B;'
+                : 'background:rgba(99,102,241,0.15);color:#818cf8;';
+
+            searchResults.innerHTML = musicians.map((m, i) => `
+                <a href="${m.url}" data-ac-item="${i}"
+                    class="flex items-center gap-3 px-4 py-2.5 transition-colors"
+                    style="border-bottom:1px solid #2a2a2a; text-decoration:none;">
+                    <img src="${m.avatar}" alt="${m.name}"
+                        class="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                        style="border:1.5px solid ${m.type === 'musician' ? '#F59E0B' : '#818cf8'};"
+                        onerror="this.style.display='none'">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <p class="text-sm font-semibold truncate" style="color:#e5e7eb;">${m.name}</p>
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style="${badgeColor(m.type)}">${m.label}</span>
+                        </div>
+                        ${m.subtitle ? `<p class="text-xs truncate" style="color:#9CA3AF;">${m.subtitle}</p>` : ''}
+                    </div>
+                    <svg class="w-4 h-4 flex-shrink-0" style="color:#555;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            `).join('');
+
+            // Hover highlight
+            searchResults.querySelectorAll('[data-ac-item]').forEach((el, i) => {
+                el.addEventListener('mouseenter', () => highlightItem(i));
+                el.addEventListener('mouseleave', () => { el.style.background = 'transparent'; activeIndex = -1; });
+            });
+
+            showDropdown();
+        }
+
+        function fetchResults(query) {
+            if (abortController) abortController.abort();
+            abortController = new AbortController();
+
+            searchResults.innerHTML = `
+                <div class="px-4 py-4 text-center">
+                    <div class="inline-block w-5 h-5 border-2 rounded-full animate-spin" style="border-color:#F59E0B transparent #F59E0B transparent;"></div>
+                </div>`;
+            showDropdown();
+
+            fetch(`/api/buscar?q=${encodeURIComponent(query)}`, {
+                signal: abortController.signal,
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => renderResults(data))
+            .catch(err => {
+                if (err.name !== 'AbortError') {
+                    hideDropdown();
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', () => {
+            const q = searchInput.value.trim();
+            if (q.length < 3) {
+                hideDropdown();
+                if (abortController) abortController.abort();
+                return;
+            }
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => fetchResults(q), 300);
+        });
+
+        // Keyboard navigation
+        searchInput.addEventListener('keydown', (e) => {
+            if (searchDropdown.classList.contains('hidden')) return;
+            const items = searchResults.querySelectorAll('[data-ac-item]');
+            if (!items.length) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                highlightItem(activeIndex < items.length - 1 ? activeIndex + 1 : 0);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlightItem(activeIndex > 0 ? activeIndex - 1 : items.length - 1);
+            } else if (e.key === 'Enter' && activeIndex >= 0) {
+                e.preventDefault();
+                items[activeIndex].click();
+            } else if (e.key === 'Escape') {
+                hideDropdown();
+                searchInput.blur();
+            }
+        });
+
+        // Hide on blur (with small delay for click events on items)
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => hideDropdown(), 200);
+        });
+
+        // Re-show on focus if there's enough text
+        searchInput.addEventListener('focus', () => {
+            if (searchInput.value.trim().length >= 3 && searchResults.innerHTML.trim()) {
+                showDropdown();
+            }
+        });
+    }
 });
 </script>
 </body>
