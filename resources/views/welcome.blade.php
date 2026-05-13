@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 </head>
 <body style="background:#111111;color:#F5F5DC;font-family:'Bricolage Grotesque','Merriweather',sans-serif;">
 
@@ -36,14 +37,22 @@
 </nav>
 
 {{-- ═══ HERO ═══ --}}
-<section style="background:#111;" class="py-20">
-    <div class="max-w-6xl mx-auto px-6">
+<section id="hero-section" style="background:#111;position:relative;overflow:hidden;min-height:85vh;display:flex;align-items:center;">
+    {{-- Interactive particle canvas --}}
+    <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
+    {{-- Ambient glow orbs (CSS only, behind content) --}}
+    <div class="hero-glow hero-glow--1"></div>
+    <div class="hero-glow hero-glow--2"></div>
+    <div class="hero-glow hero-glow--3"></div>
+
+    <div class="max-w-6xl mx-auto px-6 w-full" style="position:relative;z-index:2;">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div class="animate-fade-in-up">
-                <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-5" style="color:#F59E0B;">
+            <div id="heroContent">
+                <h1 class="hero-anim-item text-4xl md:text-5xl font-extrabold leading-tight mb-5" style="opacity:0;transform:translateY(30px);color:#F59E0B;">
                     Conectando músicos e estabelecimentos em um só lugar
                 </h1>
-                <p class="text-base mb-8" style="color:#9CA3AF;">
+                <p class="hero-anim-item text-base mb-8" style="opacity:0;transform:translateY(30px);color:#9CA3AF;max-width:480px;">
                     Encontre oportunidades, agende apresentações e fortaleça sua presença na cena musical.
                 </p>
                 @if(session('success'))
@@ -61,7 +70,7 @@
                     ✗ {{ $errors->first('email') }}
                 </div>
                 @endif
-                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex flex-col sm:flex-row gap-3 max-w-md">
+                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="hero-anim-item flex flex-col sm:flex-row gap-3 max-w-md" style="opacity:0;transform:translateY(30px);">
                     @csrf
                     <div class="relative flex-1">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2">
@@ -73,32 +82,307 @@
                     </div>
                     <button type="submit" class="btn-primary flex-shrink-0">Assinar newsletter</button>
                 </form>
-                <p class="text-xs mt-3" style="color:#555;">
+                <p class="hero-anim-item text-xs mt-3" style="opacity:0;transform:translateY(30px);color:#555;">
                     Ao criar uma conta, você confirma que aceita nossos
                     <a href="#" style="color:#F59E0B;">Termos e Condições</a>.
                 </p>
             </div>
-            <div class="animate-fade-in-up delay-200">
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="rounded-lg overflow-hidden" style="aspect-ratio:4/3;background:#1e1e1e;">
-                        <div class="w-full h-full flex items-center justify-center" style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a);">
-                            <svg class="w-16 h-16" style="color:#333;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="rounded-lg overflow-hidden" style="aspect-ratio:4/3;background:linear-gradient(135deg,#2d1b4e,#1a1a2e);">
-                        <div class="w-full h-full flex items-center justify-center">
-                            <svg class="w-16 h-16" style="color:#7c3aed;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                            </svg>
-                        </div>
+            <div style="position:relative;z-index:1;" class="flex items-center justify-center">
+                <img src="{{ asset('assets/band.svg') }}" alt="band" class="w-full h-full object-cover" style="z-index:1;">
+            </div>
+            <div id="heroVisual" style="opacity:0;transform:translateY(40px) scale(0.95);">
+                <div class="hero-visual-container">
+                    {{-- Animated equalizer bars --}}
+                    <div class="hero-equalizer">
+                        <div class="eq-bar" style="--delay:0s;--h:60%;"></div>
+                        <div class="eq-bar" style="--delay:0.15s;--h:80%;"></div>
+                        <div class="eq-bar" style="--delay:0.3s;--h:45%;"></div>
+                        <div class="eq-bar" style="--delay:0.05s;--h:90%;"></div>
+                        <div class="eq-bar" style="--delay:0.25s;--h:55%;"></div>
+                        <div class="eq-bar" style="--delay:0.1s;--h:75%;"></div>
+                        <div class="eq-bar" style="--delay:0.35s;--h:65%;"></div>
+                        <div class="eq-bar" style="--delay:0.2s;--h:85%;"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+{{-- Hero Particle Animation Script --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ─── GSAP entrance animations ───
+    if (typeof gsap !== 'undefined') {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        tl.to('.hero-anim-item', {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.12,
+        })
+        .to('#heroVisual', {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1,
+            ease: 'elastic.out(1, 0.75)',
+        }, '-=0.5')
+        .to('.hero-stat', {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: 'back.out(1.7)',
+        }, '-=0.4');
+    } else {
+        // Fallback if GSAP doesn't load
+        document.querySelectorAll('.hero-anim-item').forEach(el => {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        });
+        const vis = document.getElementById('heroVisual');
+        if (vis) { vis.style.opacity = '1'; vis.style.transform = 'none'; }
+    }
+
+    // ─── PARTICLE CANVAS ───
+    const canvas = document.getElementById('heroCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const section = document.getElementById('hero-section');
+
+    let W, H;
+    let mouse = { x: -9999, y: -9999, active: false };
+    const PARTICLE_COUNT = 70;
+    const CONNECTION_DIST = 140;
+    const MOUSE_RADIUS = 180;
+    const particles = [];
+
+    function resize() {
+        const rect = section.getBoundingClientRect();
+        W = rect.width;
+        H = rect.height;
+        canvas.width = W * window.devicePixelRatio;
+        canvas.height = H * window.devicePixelRatio;
+        ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    }
+
+    // Musical note shapes
+    const SHAPES = ['circle', 'ring', 'diamond', 'note'];
+
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * W;
+            this.y = Math.random() * H;
+            this.baseX = this.x;
+            this.baseY = this.y;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = (Math.random() - 0.5) * 0.4;
+            this.size = Math.random() * 3 + 1.5;
+            this.shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+            this.alpha = Math.random() * 0.5 + 0.2;
+            this.baseAlpha = this.alpha;
+            this.pulseSpeed = Math.random() * 0.02 + 0.008;
+            this.pulsePhase = Math.random() * Math.PI * 2;
+            // Gold-amber color palette
+            const hue = 35 + Math.random() * 20; // 35-55 range (gold to amber)
+            const sat = 80 + Math.random() * 20;
+            const light = 55 + Math.random() * 15;
+            this.color = `hsla(${hue}, ${sat}%, ${light}%, `;
+        }
+        update(time) {
+            // Organic floating movement
+            this.x += this.vx + Math.sin(time * 0.001 + this.pulsePhase) * 0.15;
+            this.y += this.vy + Math.cos(time * 0.0008 + this.pulsePhase) * 0.12;
+
+            // Pulse alpha
+            this.alpha = this.baseAlpha + Math.sin(time * this.pulseSpeed + this.pulsePhase) * 0.15;
+
+            // Mouse repulsion
+            if (mouse.active) {
+                const dx = this.x - mouse.x;
+                const dy = this.y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < MOUSE_RADIUS) {
+                    const force = (MOUSE_RADIUS - dist) / MOUSE_RADIUS;
+                    const angle = Math.atan2(dy, dx);
+                    this.x += Math.cos(angle) * force * 5;
+                    this.y += Math.sin(angle) * force * 5;
+                    // Boost glow near cursor
+                    this.alpha = Math.min(1, this.alpha + force * 0.5);
+                }
+            }
+
+            // Wrap around edges
+            if (this.x < -20) this.x = W + 20;
+            if (this.x > W + 20) this.x = -20;
+            if (this.y < -20) this.y = H + 20;
+            if (this.y > H + 20) this.y = -20;
+        }
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.fillStyle = this.color + this.alpha + ')';
+
+            switch(this.shape) {
+                case 'circle':
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'ring':
+                    ctx.strokeStyle = this.color + this.alpha * 0.8 + ')';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                    ctx.stroke();
+                    break;
+                case 'diamond':
+                    ctx.beginPath();
+                    const s = this.size * 1.2;
+                    ctx.moveTo(0, -s);
+                    ctx.lineTo(s, 0);
+                    ctx.lineTo(0, s);
+                    ctx.lineTo(-s, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                case 'note':
+                    // Simple music note ♪
+                    ctx.fillStyle = this.color + this.alpha + ')';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.9, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = this.color + this.alpha * 0.7 + ')';
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.moveTo(this.size * 0.9, 0);
+                    ctx.lineTo(this.size * 0.9, -this.size * 3);
+                    ctx.stroke();
+                    // Flag
+                    ctx.beginPath();
+                    ctx.moveTo(this.size * 0.9, -this.size * 3);
+                    ctx.quadraticCurveTo(this.size * 2.5, -this.size * 2.5, this.size * 0.9, -this.size * 1.8);
+                    ctx.stroke();
+                    break;
+            }
+
+            // Glow effect for close-to-mouse particles
+            if (mouse.active) {
+                const dx = this.x - mouse.x;
+                const dy = this.y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < MOUSE_RADIUS * 0.7) {
+                    const intensity = 1 - dist / (MOUSE_RADIUS * 0.7);
+                    ctx.shadowColor = `rgba(245, 158, 11, ${intensity * 0.6})`;
+                    ctx.shadowBlur = 15 * intensity;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            ctx.restore();
+        }
+    }
+
+    function drawConnections(time) {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < CONNECTION_DIST) {
+                    let alpha = (1 - dist / CONNECTION_DIST) * 0.15;
+
+                    // Boost connection near mouse
+                    if (mouse.active) {
+                        const mx = (particles[i].x + particles[j].x) / 2;
+                        const my = (particles[i].y + particles[j].y) / 2;
+                        const mdx = mx - mouse.x;
+                        const mdy = my - mouse.y;
+                        const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+                        if (mDist < MOUSE_RADIUS) {
+                            alpha += (1 - mDist / MOUSE_RADIUS) * 0.25;
+                        }
+                    }
+
+                    ctx.strokeStyle = `rgba(245, 158, 11, ${alpha})`;
+                    ctx.lineWidth = 0.6;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    // Draw concentric rings around cursor
+    function drawCursorRings(time) {
+        if (!mouse.active) return;
+        for (let i = 0; i < 3; i++) {
+            const radius = 30 + i * 35 + Math.sin(time * 0.003 + i) * 10;
+            const alpha = 0.08 - i * 0.02;
+            ctx.strokeStyle = `rgba(245, 158, 11, ${Math.max(alpha, 0.01)})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.arc(mouse.x, mouse.y, radius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
+
+    function animate(time) {
+        ctx.clearRect(0, 0, W, H);
+
+        drawCursorRings(time);
+        drawConnections(time);
+
+        for (const p of particles) {
+            p.update(time);
+            p.draw();
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // Initialize
+    resize();
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(new Particle());
+    }
+
+    // Mouse tracking (relative to section)
+    section.addEventListener('mousemove', (e) => {
+        const rect = section.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.active = true;
+        canvas.style.pointerEvents = 'none';
+    });
+
+    section.addEventListener('mouseleave', () => {
+        mouse.active = false;
+    });
+
+    window.addEventListener('resize', () => {
+        resize();
+        // Redistribute particles
+        particles.forEach(p => {
+            if (p.x > W) p.x = Math.random() * W;
+            if (p.y > H) p.y = Math.random() * H;
+        });
+    });
+
+    requestAnimationFrame(animate);
+});
+</script>
 
 {{-- ═══ COMO FUNCIONA – Músicos ═══ --}}
 <section id="quem-somos" class="py-16" style="background:#111;">
