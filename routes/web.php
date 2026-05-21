@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -99,3 +101,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/avaliar/{user}', [ReviewController::class, 'create'])->name('reviews.create');
     Route::post('/avaliar/{user}', [ReviewController::class, 'store'])->name('reviews.store');
 });
+
+// Chat (auth required)
+Route::middleware('auth')->prefix('chat')->group(function () {
+    Route::get('/', [ChatController::class, 'index'])->name('chats.index');
+    Route::post('/', [ChatController::class, 'store'])->name('chats.store');
+    Route::get('/{chat}', [ChatController::class, 'show'])->name('chats.show');
+    Route::post('/{chat}/mensagens', [MessageController::class, 'store'])->name('messages.store');
+});
+

@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
@@ -45,6 +47,20 @@
                     <div id="searchResults"></div>
                 </div>
             </form>
+
+            {{-- Chat icon --}}
+            @php $chatUnreadCount = auth()->user()->totalUnreadMessages(); @endphp
+            <a href="{{ route('chats.index') }}" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors relative" title="Mensagens" id="chatNavLink">
+                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+                @if($chatUnreadCount > 0)
+                    <span class="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center" style="background:#ef4444;color:#fff;">
+                        {{ $chatUnreadCount > 9 ? '9+' : $chatUnreadCount }}
+                    </span>
+                @endif
+            </a>
 
             {{-- Bell (notifications) --}}
             <div class="relative" id="notificationWrapper">

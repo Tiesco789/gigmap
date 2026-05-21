@@ -40,6 +40,23 @@
             Compartilhar Perfil
         </button>
         <span id="shareMsg" class="text-xs ml-2 hidden" style="color:#22c55e;">Link copiado!</span>
+
+        {{-- Send Message button (only for opposite types) --}}
+        @auth
+            @if(auth()->id() !== $user->id && auth()->user()->type !== $user->type)
+                <form action="{{ route('chats.store') }}" method="POST" class="inline-block mt-3">
+                    @csrf
+                    <input type="hidden" name="recipient_id" value="{{ $user->id }}">
+                    <button type="submit" class="btn-primary text-xs" style="padding:0.4rem 1rem;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        Enviar Mensagem
+                    </button>
+                </form>
+            @endif
+        @endauth
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

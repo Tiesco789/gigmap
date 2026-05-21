@@ -65,6 +65,38 @@ class User extends Authenticatable
         return $this->hasMany(Proposal::class, 'sender_id');
     }
 
+    public function chatsAsMusician(): HasMany
+    {
+        return $this->hasMany(Chat::class, 'musician_id');
+    }
+
+    public function chatsAsEstablishment(): HasMany
+    {
+        return $this->hasMany(Chat::class, 'establishment_id');
+    }
+
+    /**
+     * Get all chats for this user (as musician or establishment).
+     */
+    public function allChats()
+    {
+        return Chat::forUser($this->id);
+    }
+
+    /**
+     * Total count of unread messages across all chats.
+     */
+    public function totalUnreadMessages(): int
+    {
+        return \App\Models\Message::whereHas('chat', function ($q) {
+            $q->where('musician_id', $this->id)
+              ->orWhere('establishment_id', $this->id);
+        })
+        ->where('sender_id', '!=', $this->id)
+        ->whereNull('read_at')
+        ->count();
+    }
+
     public function isMusician(): bool
     {
         return $this->type === 'musician';
