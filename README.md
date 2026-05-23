@@ -1,62 +1,83 @@
 # GigMap 🎵
 
-> Projeto de TCC do curso Desenvolvimento de Sistemas na instituição ETEC Machado de Assis.
+> 🇧🇷 [Português](#português) | 🇺🇸 [English](#english)
 
-GigMap é uma plataforma que conecta músicos e estabelecimentos, facilitando a descoberta de artistas locais e a contratação para apresentações ao vivo. O objetivo é fortalecer a economia criativa, gerar oportunidades para músicos e incentivar a cultura local.
+---
 
+## Português
 
-## Propósito ✨
+> Projeto de TCC — Desenvolvimento de Sistemas | ETEC Machado de Assis
 
-O GigMap cria oportunidades de trabalho para músicos e movimenta a economia dos estabelecimentos.
-A plataforma estimula a economia criativa, incentivando a cultura como um motor econômico.
+GigMap é uma plataforma que conecta músicos e estabelecimentos, facilitando a descoberta de artistas locais e a contratação para apresentações ao vivo. O objetivo é fortalecer a economia criativa, gerar oportunidades para músicos independentes e incentivar a cultura local.
 
-Além disso, promove inclusão social e cultural, dando visibilidade a artistas que muitas vezes não encontram espaço para se apresentar. Dessa forma, contribui para manter a música local viva e tornar as cidades mais culturais, vibrantes e inclusivas.
+---
 
-## Tecnologias Utilizadas 🚀
+### ✨ Propósito
 
-Este projeto foi desenvolvido utilizando as seguintes tecnologias:
-- PHP
-- Laravel
-- PostgreSQL
-- TailwindCSS
-- Blade Templates
-- Vite
+O GigMap cria oportunidades reais de trabalho para músicos e movimenta a economia dos estabelecimentos culturais. A plataforma estimula a economia criativa, promove inclusão social e dá visibilidade a artistas que muitas vezes não encontram espaço para se apresentar — contribuindo para manter a música local viva e as cidades mais vibrantes.
 
-## Instalação 📦
+---
 
-### 1️⃣ Clonar o repositório
+### 🚀 Tecnologias Utilizadas
+
+| Camada | Tecnologia |
+|---|---|
+| Backend | PHP 8.2, Laravel 12 |
+| Banco de Dados | PostgreSQL |
+| Frontend | Blade Templates, TailwindCSS |
+| Build de Assets | Vite |
+| WebSockets | Laravel Reverb |
+| E-mail | Mailtrap |
+
+---
+
+### ⚙️ Funcionalidades
+
+- Cadastro e autenticação de usuários (músicos e estabelecimentos)
+- Recuperação e redefinição de senha via modal
+- Publicação de anúncios de eventos com controle de data
+- Exibição de aviso de evento expirado ("Este evento já passou")
+- Botão de contato direto com o autor do anúncio
+- Chat em tempo real entre músicos e estabelecimentos (via Laravel Reverb)
+- Mensagens com horário ajustado para o fuso de Brasília (UTC-3)
+- Atualização automática do chat sem necessidade de recarregar a página
+
+---
+
+### 📦 Instalação
+
+#### 1. Clonar o repositório
+
 ```bash
-git clone https://github.com/seu-usuario/gigmap.git
+git clone https://github.com/tiesco789/gigmap.git
 cd gigmap
 ```
 
-### 2️⃣ Instalar dependências do PHP
+#### 2. Instalar dependências PHP
+
 ```bash
 composer install
 ```
 
-### 3️⃣ Instalar dependências do frontend
+#### 3. Instalar dependências do frontend
+
 ```bash
-npm install
-# or
-pnpm i
-# or
-yarn
+pnpm install
+# ou: npm install
 ```
 
-### 4️⃣ Configurar variáveis de ambiente
-> linux
+#### 4. Configurar variáveis de ambiente
+
+**Linux/macOS:**
 ```bash
 cp .env.example .env
 ```
 
-> windows
+**Windows:** Copie o arquivo `.env.example` e renomeie para `.env`.
 
-Copie e cole o arquivo `.env.example` e renomei para apenas `.env`
+Configure as variáveis do banco de dados:
 
-
-#### Configure as variáveis do banco PostgreSQL:
-```
+```env
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
@@ -65,64 +86,223 @@ DB_USERNAME=postgres
 DB_PASSWORD=
 ```
 
-### 5️⃣ Gerar chave da aplicação
+Configure o Laravel Reverb (WebSockets):
+
+```env
+REVERB_APP_ID=
+REVERB_APP_KEY=
+REVERB_APP_SECRET=
+REVERB_HOST=localhost
+REVERB_PORT=8080
+REVERB_SCHEME=http
+```
+
+#### 5. Gerar a chave da aplicação
+
 ```bash
 php artisan key:generate
 ```
 
-### 6️⃣ Executar as migrations
+#### 6. Executar as migrations
+
 ```bash
 php artisan migrate
 ```
 
-### 7️⃣ Rodar o servidor
+#### 7. Iniciar os serviços
+
+Em terminais separados:
+
 ```bash
+# Servidor Laravel
 php artisan serve
-```
 
-### Rodar o Vite para assets:
+# Servidor WebSocket (Reverb)
+php artisan reverb:start
 
-```bash
-npm run dev
-# or
+# Assets (Vite)
 pnpm dev
 ```
 
-A aplicação estará disponível em:
-`http://localhost:8000`
+A aplicação estará disponível em `http://localhost:8000`.
 
+---
 
-### Estrutura do Projeto
+### 🗂️ Estrutura do Projeto
+
 ```
 app/
- ├── Models
- ├── Http
- │   ├── Controllers
- │   ├── Middleware
- │   └── Requests
+├── Models/
+├── Http/
+│   ├── Controllers/
+│   ├── Middleware/
+│   └── Requests/
 
 resources/
- ├── views
- ├── css
- └── js
+├── views/
+├── css/
+└── js/
 
 database/
- ├── migrations
- └── seeders
+├── migrations/
+└── seeders/
 ```
-
-## 🎯 Funcionalidades (Planejadas)
-- Cadastro de músicos
-- Cadastro de estabelecimentos
-- Perfil público de artistas
-- Mapa de gigs e eventos
-- Sistema de mensagens entre músicos e estabelecimentos
-- Sistema de avaliação
-- Agenda de apresentações
 
 ---
 
 ### 📄 Licença
-Este projeto está sob a licença MIT.
+
+Distribuído sob a licença MIT.
 
 ---
+---
+
+## English
+
+> Final Course Project — Systems Development | ETEC Machado de Assis
+
+GigMap is a platform that connects musicians and venues, making it easier to discover local artists and book them for live performances. The goal is to strengthen the creative economy, create opportunities for independent musicians, and promote local culture.
+
+---
+
+### ✨ Purpose
+
+GigMap creates real job opportunities for musicians while boosting the economy of cultural venues. The platform encourages the creative economy, promotes social inclusion, and gives visibility to artists who often struggle to find performance spaces — helping keep local music alive and cities more vibrant.
+
+---
+
+### 🚀 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | PHP 8.2, Laravel 12 |
+| Database | PostgreSQL |
+| Frontend | Blade Templates, TailwindCSS |
+| Asset Bundler | Vite |
+| WebSockets | Laravel Reverb |
+| Email | Mailtrap |
+
+---
+
+### ⚙️ Features
+
+- User registration and authentication (musicians and venues)
+- Password recovery and reset via modal
+- Event listing with date control
+- Expired event notice ("This event has already passed")
+- Direct contact button to the listing author
+- Real-time chat between musicians and venues (via Laravel Reverb)
+- Messages displayed in Brasília timezone (UTC-3)
+- Automatic chat refresh — no need to reload the page manually
+
+---
+
+### 📦 Installation
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/tiesco789/gigmap.git
+cd gigmap
+```
+
+#### 2. Install PHP dependencies
+
+```bash
+composer install
+```
+
+#### 3. Install frontend dependencies
+
+```bash
+pnpm install
+# or: npm install
+```
+
+#### 4. Set up environment variables
+
+**Linux/macOS:**
+```bash
+cp .env.example .env
+```
+
+**Windows:** Copy `.env.example` and rename it to `.env`.
+
+Set your database variables:
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=gigmap
+DB_USERNAME=postgres
+DB_PASSWORD=
+```
+
+Set up Laravel Reverb (WebSockets):
+
+```env
+REVERB_APP_ID=
+REVERB_APP_KEY=
+REVERB_APP_SECRET=
+REVERB_HOST=localhost
+REVERB_PORT=8080
+REVERB_SCHEME=http
+```
+
+#### 5. Generate the application key
+
+```bash
+php artisan key:generate
+```
+
+#### 6. Run database migrations
+
+```bash
+php artisan migrate
+```
+
+#### 7. Start the services
+
+In separate terminals:
+
+```bash
+# Laravel server
+php artisan serve
+
+# WebSocket server (Reverb)
+php artisan reverb:start
+
+# Frontend assets (Vite)
+pnpm dev
+```
+
+The application will be available at `http://localhost:8000`.
+
+---
+
+### 🗂️ Project Structure
+
+```
+app/
+├── Models/
+├── Http/
+│   ├── Controllers/
+│   ├── Middleware/
+│   └── Requests/
+
+resources/
+├── views/
+├── css/
+└── js/
+
+database/
+├── migrations/
+└── seeders/
+```
+
+---
+
+### 📄 License
+
+Distributed under the MIT License.
