@@ -43,7 +43,7 @@ class MessageSent implements ShouldBroadcast
             'sender_name'    => $this->message->sender->getDisplayName(),
             'sender_avatar'  => $this->message->sender->getAvatarUrl(),
             'body'           => $this->message->body,
-            'created_at'     => $this->message->created_at->format('H:i'),
+            'created_at'     => $this->message->created_at->setTimezone('America/Sao_Paulo')->format('H:i'),
             'created_at_full' => $this->message->created_at->toIso8601String(),
         ];
     }

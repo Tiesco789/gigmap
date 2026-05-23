@@ -45,7 +45,7 @@ class MessageController extends Controller
                 'sender_name'     => $message->sender->getDisplayName(),
                 'sender_avatar'   => $message->sender->getAvatarUrl(),
                 'body'            => $message->body,
-                'created_at'      => $message->created_at->format('H:i'),
+                'created_at'      => $message->created_at->setTimezone('America/Sao_Paulo')->format('H:i'),
                 'created_at_full' => $message->created_at->toIso8601String(),
             ]);
         }

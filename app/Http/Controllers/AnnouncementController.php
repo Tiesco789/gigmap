@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class AnnouncementController extends Controller
 {
@@ -15,6 +16,10 @@ class AnnouncementController extends Controller
         $search = $request->query('search');
 
         $query = Announcement::with('user.musicianProfile', 'user.establishmentProfile')
+            ->where(function ($q) {
+                $q->whereNull('event_date')
+                  ->orWhere('event_date', '>=', Carbon::today());
+            })
             ->latest();
 
         if ($genre && $genre !== 'all') {
@@ -67,6 +72,7 @@ class AnnouncementController extends Controller
             'price'       => 'nullable|numeric|min:0',
             'location'    => 'nullable|string|max:255',
             'genre'       => 'nullable|string|max:100',
+            'event_date'  => 'nullable|date|after_or_equal:today',
             'image'       => 'nullable|image|max:4096',
         ]);
 
@@ -82,6 +88,7 @@ class AnnouncementController extends Controller
             'price'       => $validated['price'] ?? null,
             'location'    => $validated['location'] ?? null,
             'genre'       => $validated['genre'] ?? null,
+            'event_date'  => $validated['event_date'] ?? null,
             'image'       => $imagePath,
         ]);
 
@@ -106,6 +113,7 @@ class AnnouncementController extends Controller
             'price'       => 'nullable|numeric|min:0',
             'location'    => 'nullable|string|max:255',
             'genre'       => 'nullable|string|max:100',
+            'event_date'  => 'nullable|date',
             'image'       => 'nullable|image|max:4096',
         ]);
 

@@ -91,7 +91,7 @@ class ChatController extends Controller
                 'sender_name'    => $msg->sender->getDisplayName(),
                 'sender_avatar'  => $msg->sender->getAvatarUrl(),
                 'body'           => $msg->body,
-                'created_at'     => $msg->created_at->format('H:i'),
+                'created_at'     => $msg->created_at->setTimezone('America/Sao_Paulo')->format('H:i'),
                 'created_at_full' => $msg->created_at->toIso8601String(),
             ]);
 
@@ -107,5 +107,43 @@ class ChatController extends Controller
             'otherParticipant' => $otherParticipant,
             'currentUserId'    => $user->id,
         ]);
+    }
+
+    /**
+     * Return messages newer than the given ID (for polling fallback).
+     */
+    public function newMessages(Request $request, Chat $chat)
+    {
+        $this->authorize('view', $chat);
+
+        $user = Auth::user();
+        $afterId = (int) $request->query('after', 0);
+
+        $newMessages = $chat->messages()
+            ->with('sender')
+            ->where('id', '>', $afterId)
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->map(fn ($msg) => [
+                'id'              => $msg->id,
+                'chat_id'         => $msg->chat_id,
+                'sender_id'       => $msg->sender_id,
+                'sender_name'     => $msg->sender->getDisplayName(),
+                'sender_avatar'   => $msg->sender->getAvatarUrl(),
+                'body'            => $msg->body,
+                'created_at'      => $msg->created_at->setTimezone('America/Sao_Paulo')->format('H:i'),
+                'created_at_full' => $msg->created_at->toIso8601String(),
+            ]);
+
+        // Mark incoming unread messages as read
+        if ($newMessages->isNotEmpty()) {
+            $chat->messages()
+                ->where('sender_id', '!=', $user->id)
+                ->where('id', '>', $afterId)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        }
+
+        return response()->json($newMessages);
     }
 }

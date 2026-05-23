@@ -25,6 +25,7 @@ Route::post('/cadastro', [AuthController::class, 'register']);
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/redefinir-senha', [AuthController::class, 'resetPassword'])->name('password.reset');
 
 // Profile (auth required)
 Route::middleware('auth')->group(function () {
@@ -107,6 +108,7 @@ Route::middleware('auth')->prefix('chat')->group(function () {
     Route::get('/', [ChatController::class, 'index'])->name('chats.index');
     Route::post('/', [ChatController::class, 'store'])->name('chats.store');
     Route::get('/{chat}', [ChatController::class, 'show'])->name('chats.show');
+    Route::get('/{chat}/novas-mensagens', [ChatController::class, 'newMessages'])->name('chats.newMessages');
     Route::post('/{chat}/mensagens', [MessageController::class, 'store'])->name('messages.store');
 });
 

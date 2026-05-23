@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -14,11 +15,13 @@ class Announcement extends Model
         'price',
         'location',
         'genre',
+        'event_date',
         'image',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price'      => 'decimal:2',
+        'event_date' => 'date',
     ];
 
     public function user(): BelongsTo
@@ -60,5 +63,27 @@ class Announcement extends Model
             return 'R$' . number_format($this->price, 0, ',', '.');
         }
         return 'A combinar';
+    }
+
+    /**
+     * Check if the event date has already passed.
+     */
+    public function isExpired(): bool
+    {
+        if (!$this->event_date) {
+            return false;
+        }
+        return $this->event_date->endOfDay()->isPast();
+    }
+
+    /**
+     * Return a human-friendly formatted event date.
+     */
+    public function getFormattedEventDate(): ?string
+    {
+        if (!$this->event_date) {
+            return null;
+        }
+        return $this->event_date->format('d/m/Y');
     }
 }

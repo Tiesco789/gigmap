@@ -63,6 +63,14 @@
             </select>
         </div>
 
+        {{-- Event Date --}}
+        <div class="form-section">
+            <div class="form-section-label">Data do Evento</div>
+            <input type="date" name="event_date" value="{{ old('event_date', $announcement->event_date?->format('Y-m-d')) }}" class="input-subtle" style="max-width:300px;">
+            <p class="text-xs mt-1" style="color:#9CA3AF;">Após esta data, o anúncio não será mais exibido como ativo.</p>
+            @error('event_date')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+        </div>
+
         {{-- Price / Location --}}
         <div class="form-section">
             <div class="form-section-label">Valor / Localização</div>

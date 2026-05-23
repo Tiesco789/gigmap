@@ -133,4 +133,34 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('home');
     }
+
+    public function resetPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ], [
+            'email.required'     => 'Informe o e-mail cadastrado.',
+            'email.email'        => 'Informe um e-mail válido.',
+            'password.required'  => 'Informe a nova senha.',
+            'password.min'       => 'A senha deve ter pelo menos 8 caracteres.',
+            'password.confirmed' => 'As senhas não coincidem.',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'reset_email' => 'Nenhuma conta encontrada com este e-mail.',
+            ])->withInput(['reset_email' => $validated['email']])
+              ->with('open_reset_modal', true);
+        }
+
+        $user->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return redirect()->route('login')
+            ->with('success', 'Senha redefinida com sucesso! Faça login com sua nova senha.');
+    }
 }

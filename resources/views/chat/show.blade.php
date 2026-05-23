@@ -94,25 +94,133 @@ function chatApp() {
         currentUserId: {{ $currentUserId }},
         chatId: {{ $chat->id }},
         csrfToken: '{{ csrf_token() }}',
+        pollingInterval: null,
+        echoConnected: false,
 
         init() {
             this.$nextTick(() => this.scrollToBottom());
 
-            // Listen for new messages via Echo
+            // Try Echo (Reverb WebSocket) first
             if (window.Echo) {
-                window.Echo.private(`chat.${this.chatId}`)
-                    .listen('MessageSent', (e) => {
+                try {
+                    const channel = window.Echo.private(`chat.${this.chatId}`);
+                    channel.listen('MessageSent', (e) => {
                         // Avoid duplicating own messages
                         if (e.sender_id == this.currentUserId) return;
+                        // Avoid duplicating messages already in the list
+                        if (this.messages.some(m => m.id === e.id)) return;
 
                         this.messages.push(e);
                         this.$nextTick(() => this.scrollToBottom());
-
-                        // Mark as read by pinging the server
-                        fetch(`/chat/${this.chatId}`, {
-                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                        });
                     });
+
+                    // Check if Echo/Pusher connects within 3 seconds
+                    const pusherConn = window.Echo.connector?.pusher?.connection;
+                    if (pusherConn) {
+                        pusherConn.bind('connected', () => {
+                            this.echoConnected = true;
+                            this.stopPolling();
+                        });
+                        pusherConn.bind('disconnected', () => {
+                            this.echoConnected = false;
+                            this.startPolling();
+                        });
+                    }
+
+                    // Start polling as fallback — will stop if Echo connects
+                    setTimeout(() => {
+                        if (!this.echoConnected) {
+                            this.startPolling();
+                        }
+                    }, 3000);
+                } catch (err) {
+                    // Echo failed to initialize, fall back to polling
+                    this.startPolling();
+                }
+            } else {
+                // No Echo available, use polling
+                this.startPolling();
+            }
+        },
+
+        /**
+         * Get the current time formatted in Brasília timezone (HH:mm).
+         */
+        getBrasiliaTime() {
+            return new Intl.DateTimeFormat('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'America/Sao_Paulo',
+                hour12: false,
+            }).format(new Date());
+        },
+
+        /**
+         * Get the highest message ID for polling.
+         */
+        getLastMessageId() {
+            for (let i = this.messages.length - 1; i >= 0; i--) {
+                const id = this.messages[i].id;
+                if (typeof id === 'number') return id;
+            }
+            return 0;
+        },
+
+        /**
+         * Start polling for new messages every 3 seconds.
+         */
+        startPolling() {
+            if (this.pollingInterval) return;
+            this.pollingInterval = setInterval(() => this.pollMessages(), 3000);
+        },
+
+        stopPolling() {
+            if (this.pollingInterval) {
+                clearInterval(this.pollingInterval);
+                this.pollingInterval = null;
+            }
+        },
+
+        async pollMessages() {
+            try {
+                const lastId = this.getLastMessageId();
+                const response = await fetch(`/chat/${this.chatId}/novas-mensagens?after=${lastId}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                if (response.ok) {
+                    const newMessages = await response.json();
+                    let hasNew = false;
+
+                    newMessages.forEach(msg => {
+                        // Skip own messages (already added optimistically)
+                        if (msg.sender_id == this.currentUserId) {
+                            // But replace temp messages with real ones
+                            const tempIdx = this.messages.findIndex(m =>
+                                String(m.id).startsWith('temp-') && m.sender_id == this.currentUserId
+                            );
+                            if (tempIdx !== -1) {
+                                this.messages[tempIdx] = msg;
+                            }
+                            return;
+                        }
+
+                        // Avoid duplicates
+                        if (!this.messages.some(m => m.id === msg.id)) {
+                            this.messages.push(msg);
+                            hasNew = true;
+                        }
+                    });
+
+                    if (hasNew) {
+                        this.$nextTick(() => this.scrollToBottom());
+                    }
+                }
+            } catch (err) {
+                // Silently ignore polling errors
             }
         },
 
@@ -122,14 +230,14 @@ function chatApp() {
 
             this.sending = true;
 
-            // Optimistic append
+            // Optimistic append with Brasília time
             const tempId = 'temp-' + Date.now();
             const optimisticMsg = {
                 id: tempId,
                 chat_id: this.chatId,
                 sender_id: this.currentUserId,
                 body: body,
-                created_at: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                created_at: this.getBrasiliaTime(),
             };
             this.messages.push(optimisticMsg);
             this.newMessage = '';
