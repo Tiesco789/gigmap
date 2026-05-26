@@ -3,7 +3,7 @@
 @section('title', 'Editar Perfil')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-6 py-10 animate-fade-in-up">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-fade-in-up">
 
     <h1 class="text-xl font-bold mb-1" style="color:#F59E0B;">
         {{ $user->isMusician() ? 'Conta' : 'Conta' }}

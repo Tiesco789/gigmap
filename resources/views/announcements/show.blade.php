@@ -3,7 +3,7 @@
 @section('title', $announcement->title)
 
 @section('content')
-<div class="max-w-6xl mx-auto px-6 py-12 animate-fade-in-up">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 animate-fade-in-up">
 
     @if($announcement->isExpired())
     {{-- ══════════ Expired event state ══════════ --}}
@@ -16,7 +16,7 @@
         </div>
 
         {{-- Message --}}
-        <h1 class="text-3xl md:text-4xl font-extrabold mb-3" style="color:#ef4444;">Este evento já passou</h1>
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3" style="color:#ef4444;">Este evento já passou</h1>
         <p class="text-base mb-2" style="color:#9CA3AF;">O evento <strong style="color:#d1d5db;">{{ $announcement->title }}</strong> estava agendado para:</p>
         <p class="text-2xl font-bold mb-6" style="color:#F59E0B;">{{ $announcement->getFormattedEventDate() }}</p>
         <p class="text-sm mb-8" style="color:#6B7280;max-width:480px;">
@@ -47,8 +47,8 @@
     {{-- ══════════ Active event ══════════ --}}
 
     {{-- Title + Actions --}}
-    <div class="flex items-start justify-between gap-6 mb-8">
-        <h1 class="text-3xl font-bold" style="color:#F59E0B;">{{ $announcement->title }}</h1>
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
+        <h1 class="text-2xl sm:text-3xl font-bold" style="color:#F59E0B;">{{ $announcement->title }}</h1>
         @if(auth()->id() !== $announcement->user_id)
         <div class="flex items-center gap-2 flex-shrink-0">
             {{-- Contact button --}}
@@ -112,7 +112,7 @@
 
     {{-- Image + Description --}}
     <div class="flex flex-col md:flex-row gap-10 mb-10">
-        <div class="md:w-80 flex-shrink-0">
+        <div class="w-full md:w-80 flex-shrink-0">
             <img src="{{ $announcement->getImageUrl() }}" alt="{{ $announcement->title }}"
                 class="w-full rounded-lg object-cover" style="max-height:280px;">
         </div>

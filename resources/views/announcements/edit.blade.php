@@ -3,7 +3,7 @@
 @section('title', 'Editar Anúncio')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-6 py-10 animate-fade-in-up">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 animate-fade-in-up">
 
     <div class="mb-6">
         <h1 class="text-2xl font-bold" style="color:#F59E0B;">Editar Anúncio</h1>

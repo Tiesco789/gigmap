@@ -3,9 +3,9 @@
 @section('title', 'Avaliar – ' . $user->getDisplayName())
 
 @section('content')
-<div class="max-w-4xl mx-auto px-6 py-12 animate-fade-in-up">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 animate-fade-in-up">
 
-    <h1 class="text-2xl font-bold mb-8" style="color:#F59E0B;">Deixe sua recomendação</h1>
+    <h1 class="text-xl sm:text-2xl font-bold mb-8" style="color:#F59E0B;">Deixe sua recomendação</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 

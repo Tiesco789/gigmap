@@ -4,14 +4,14 @@
 @section('meta_description', 'A plataforma onde artistas encontram palco e palcos encontram artista. Simplifique sua busca por shows, eventos e músicos qualificados.')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-6 py-14 animate-fade-in-up">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14 animate-fade-in-up">
 
     {{-- Hero header --}}
     <div class="text-center mb-10">
-        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-3" style="color:#F59E0B;">
-            A plataforma onde artistas encontram<br>palco e palcos encontram artista
+        <h1 class="text-2xl sm:text-3xl desktop:text-5xl font-extrabold leading-tight mb-3" style="color:#F59E0B;">
+            A plataforma onde artistas encontram<br class="hidden sm:inline">palco e palcos encontram artista
         </h1>
-        <p class="text-base" style="color:#9CA3AF;">Simplifique sua busca por shows, eventos e músicos qualificados.</p>
+        <p class="text-sm sm:text-base" style="color:#9CA3AF;">Simplifique sua busca por shows, eventos e músicos qualificados.</p>
     </div>
 
     {{-- Genre filter tabs --}}

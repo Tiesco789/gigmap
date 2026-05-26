@@ -16,15 +16,15 @@
 <body>
 
 {{-- Navbar (authenticated) --}}
-<nav class="navbar">
-    <div class="max-w-6xl mx-auto px-6 flex items-center h-14 gap-8">
+<nav class="navbar" x-data="{ mobileMenuOpen: false }">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center h-14 gap-8">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="flex-shrink-0">
             <img src="{{ asset('assets/logo-gigmap.svg') }}" width="120"  />
         </a>
 
-        {{-- Nav links --}}
-        <div class="hidden md:flex items-center gap-7 flex-1">
+        {{-- Nav links (desktop only) --}}
+        <div class="hidden desktop:flex items-center gap-7 flex-1">
             <a href="{{ route('announcements.index') }}" class="btn-ghost text-sm">Anúncios</a>
             <a href="{{ route('home') }}#quem-somos" class="btn-ghost text-sm">Quem Somos</a>
             <a href="{{ route('home') }}#sobre" class="btn-ghost text-sm">Sobre o Projeto</a>
@@ -32,7 +32,7 @@
 
         {{-- Search + user menu --}}
         <div class="flex items-center gap-3 ml-auto">
-            <form action="{{ route('announcements.index') }}" method="GET" class="hidden md:flex items-center relative" id="searchForm" autocomplete="off">
+            <form action="{{ route('announcements.index') }}" method="GET" class="hidden desktop:flex items-center relative" id="searchForm" autocomplete="off">
                 <div class="flex items-center border border-amber-500 rounded px-3 py-1.5 gap-2" style="background:#1a1a1a;">
                     <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -115,18 +115,98 @@
                     </form>
                 </div>
             </div>
+
+            {{-- Hamburger button (mobile/tablet) --}}
+            <button class="hamburger-btn desktop:hidden" @click="mobileMenuOpen = !mobileMenuOpen" :aria-expanded="mobileMenuOpen.toString()" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+
+    {{-- Mobile Menu Overlay --}}
+    <div class="mobile-menu-overlay desktop:hidden" :class="{ 'active': mobileMenuOpen }" @click="mobileMenuOpen = false"></div>
+
+    {{-- Mobile Menu Panel --}}
+    <div class="mobile-menu desktop:hidden" :class="{ 'active': mobileMenuOpen }">
+        <div class="mobile-menu-header">
+            <a href="{{ route('home') }}" class="flex-shrink-0">
+                <img src="{{ asset('assets/logo-gigmap.svg') }}" width="100" />
+            </a>
+            <button class="mobile-menu-close" @click="mobileMenuOpen = false" aria-label="Fechar menu">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="mobile-menu-body">
+            {{-- Search (mobile) --}}
+            <form action="{{ route('announcements.index') }}" method="GET" class="mobile-menu-search" autocomplete="off">
+                <svg class="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="search" placeholder="Buscar..." value="{{ request('search') }}">
+            </form>
+
+            {{-- Nav links --}}
+            <a href="{{ route('announcements.index') }}" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                Anúncios
+            </a>
+            <a href="{{ route('home') }}#quem-somos" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Quem Somos
+            </a>
+            <a href="{{ route('home') }}#sobre" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Sobre o Projeto
+            </a>
+
+            <hr class="mobile-menu-divider">
+
+            {{-- User actions --}}
+            <a href="{{ route('profile.edit') }}" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Meu Perfil
+            </a>
+            <a href="{{ route('profile.show', auth()->user()) }}" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Perfil Público
+            </a>
+            <a href="{{ route('announcements.create') }}" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Criar Anúncio
+            </a>
+            <a href="{{ route('chats.index') }}" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Mensagens
+                @if($chatUnreadCount > 0)
+                    <span class="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full" style="background:#ef4444;color:#fff;">{{ $chatUnreadCount > 9 ? '9+' : $chatUnreadCount }}</span>
+                @endif
+            </a>
+
+            <hr class="mobile-menu-divider">
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="mobile-menu-link w-full" style="color:#ef4444;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#ef4444;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sair
+                </button>
+            </form>
         </div>
     </div>
 </nav>
 
 {{-- Flash messages --}}
 @if(session('success'))
-<div class="max-w-6xl mx-auto px-6 mt-4">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 mt-4">
     <div class="alert-success">{{ session('success') }}</div>
 </div>
 @endif
 @if($errors->any())
-<div class="max-w-6xl mx-auto px-6 mt-4">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 mt-4">
     <div class="alert-error">
         <ul class="list-disc list-inside space-y-1">
             @foreach($errors->all() as $error)

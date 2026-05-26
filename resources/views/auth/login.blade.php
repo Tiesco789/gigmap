@@ -3,8 +3,8 @@
 @section('title', 'Fazer Login')
 
 @section('content')
-<div class="max-w-md mx-auto px-6 py-16 animate-fade-in-up">
-    <h1 class="text-3xl font-bold mb-2" style="color:#F59E0B;">Fazer Login</h1>
+<div class="max-w-md mx-auto px-4 sm:px-6 py-12 sm:py-16 animate-fade-in-up">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-2" style="color:#F59E0B;">Fazer Login</h1>
     <p class="text-sm mb-8" style="color:#9CA3AF;">Entre na sua conta GigMap para continuar.</p>
 
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div class="flex items-center gap-2">
                 <input type="checkbox" name="remember" id="remember" class="accent-amber-400">
                 <label for="remember" class="text-sm" style="color:#9CA3AF;">Lembrar de mim</label>

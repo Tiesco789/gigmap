@@ -3,7 +3,7 @@
 @section('title', 'Cadastro')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-6 py-12 animate-fade-in-up">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-12 animate-fade-in-up">
 
     {{-- Tabs --}}
     <div class="flex gap-8 mb-8 border-b" style="border-color:#2a2a2a;">
@@ -43,7 +43,7 @@
                 <input type="hidden" name="type" value="musician">
                 <input type="file" id="avatar_musician" name="avatar" class="hidden" accept="image/*">
 
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="label-gold">Nome</label>
                         <input type="text" name="first_name" value="{{ old('first_name') }}"
@@ -83,7 +83,7 @@
                     @error('state')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="label-gold">Cidade</label>
                         <input type="text" name="city" value="{{ old('city') }}" class="input-field">

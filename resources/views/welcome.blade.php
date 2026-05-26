@@ -9,35 +9,90 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 </head>
 <body style="background:#111111;color:#F5F5DC;font-family:'Bricolage Grotesque','Merriweather',sans-serif;">
 
 {{-- ═══ NAVBAR ═══ --}}
-<nav class="navbar">
-    <div class="max-w-6xl mx-auto px-6 flex items-center h-14 gap-8">
+<nav class="navbar" x-data="{ mobileMenuOpen: false }">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center h-14 gap-8">
         <a href="{{ route('home') }}" class="flex-shrink-0">
             <img src="{{ asset('assets/logo-gigmap.svg') }}" width="120"  />
         </a>
 
-        <div class="hidden md:flex items-center gap-7 flex-1">
+        <div class="hidden desktop:flex items-center gap-7 flex-1">
             <a href="{{ route('announcements.index') }}" class="btn-ghost text-sm">Anúncios</a>
             <a href="#quem-somos" class="btn-ghost text-sm">Quem Somos</a>
             <a href="#sobre" class="btn-ghost text-sm">Sobre o Projeto</a>
         </div>
         <div class="flex items-center gap-3 ml-auto">
             @auth
-            <a href="{{ route('announcements.index') }}" class="btn-primary text-sm" style="padding:0.4rem 1rem;">Ver Anúncios</a>
+            <a href="{{ route('announcements.index') }}" class="btn-primary text-sm hidden sm:inline-flex" style="padding:0.4rem 1rem;">Ver Anúncios</a>
             @else
-            <a href="{{ route('login') }}" class="btn-outline-gold text-sm" style="padding:0.4rem 1rem;">Fazer Login</a>
-            <a href="{{ route('register') }}" class="btn-primary text-sm" style="padding:0.4rem 1rem;">Cadastre-se</a>
+            <a href="{{ route('login') }}" class="btn-outline-gold text-sm hidden sm:inline-flex" style="padding:0.4rem 1rem;">Fazer Login</a>
+            <a href="{{ route('register') }}" class="btn-primary text-sm hidden sm:inline-flex" style="padding:0.4rem 1rem;">Cadastre-se</a>
+            @endauth
+
+            {{-- Hamburger button --}}
+            <button class="hamburger-btn desktop:hidden" @click="mobileMenuOpen = !mobileMenuOpen" :aria-expanded="mobileMenuOpen.toString()" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+
+    {{-- Mobile Menu Overlay --}}
+    <div class="mobile-menu-overlay desktop:hidden" :class="{ 'active': mobileMenuOpen }" @click="mobileMenuOpen = false"></div>
+
+    {{-- Mobile Menu Panel --}}
+    <div class="mobile-menu desktop:hidden" :class="{ 'active': mobileMenuOpen }">
+        <div class="mobile-menu-header">
+            <a href="{{ route('home') }}" class="flex-shrink-0">
+                <img src="{{ asset('assets/logo-gigmap.svg') }}" width="100" />
+            </a>
+            <button class="mobile-menu-close" @click="mobileMenuOpen = false" aria-label="Fechar menu">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="mobile-menu-body">
+            <a href="{{ route('announcements.index') }}" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                Anúncios
+            </a>
+            <a href="#quem-somos" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Quem Somos
+            </a>
+            <a href="#sobre" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Sobre o Projeto
+            </a>
+            <hr class="mobile-menu-divider">
+            @auth
+            <a href="{{ route('announcements.index') }}" class="mobile-menu-link" style="color:#F59E0B;" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Ver Anúncios
+            </a>
+            @else
+            <a href="{{ route('login') }}" class="mobile-menu-link" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                Fazer Login
+            </a>
+            <a href="{{ route('register') }}" class="mobile-menu-link" style="color:#F59E0B;" @click="mobileMenuOpen = false">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                Cadastre-se
+            </a>
             @endauth
         </div>
     </div>
 </nav>
 
 {{-- ═══ HERO ═══ --}}
-<section id="hero-section" style="background:#111;position:relative;overflow:hidden;min-height:85vh;display:flex;align-items:center;">
+<section id="hero-section" style="background:#111;position:relative;overflow:hidden;display:flex;align-items:center;" class="min-h-[60vh] sm:min-h-[75vh] desktop:min-h-[85vh] py-12 sm:py-0">
     {{-- Interactive particle canvas --}}
     <canvas id="heroCanvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 
@@ -46,13 +101,13 @@
     <div class="hero-glow hero-glow--2"></div>
     <div class="hero-glow hero-glow--3"></div>
 
-    <div class="max-w-6xl mx-auto px-6 w-full" style="position:relative;z-index:2;">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 w-full" style="position:relative;z-index:2;">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 desktop:gap-12 items-center">
             <div id="heroContent">
-                <h1 class="hero-anim-item text-4xl md:text-5xl font-extrabold leading-tight mb-5" style="opacity:0;transform:translateY(30px);color:#F59E0B;">
+                <h1 class="hero-anim-item text-2xl sm:text-3xl desktop:text-5xl font-extrabold leading-tight mb-5" style="opacity:0;transform:translateY(30px);color:#F59E0B;">
                     Conectando músicos e estabelecimentos em um só lugar
                 </h1>
-                <p class="hero-anim-item text-base mb-8" style="opacity:0;transform:translateY(30px);color:#9CA3AF;max-width:480px;">
+                <p class="hero-anim-item text-sm sm:text-base mb-8" style="opacity:0;transform:translateY(30px);color:#9CA3AF;max-width:480px;">
                     Encontre oportunidades, agende apresentações e fortaleça sua presença na cena musical.
                 </p>
                 @if(session('success'))
@@ -386,9 +441,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {{-- ═══ COMO FUNCIONA – Músicos ═══ --}}
 <section id="quem-somos" class="py-16" style="background:#111;">
-    <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <p class="text-xs font-semibold mb-2" style="color:#9CA3AF;">Para músicos</p>
-        <h2 class="text-3xl font-bold mb-8">Como Funciona</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-8">Como Funciona</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {{-- Card 1 --}}
@@ -421,9 +476,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {{-- ═══ COMO FUNCIONA – Estabelecimentos ═══ --}}
 <section class="py-16" style="background:#0e0e0e;">
-    <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <p class="text-xs font-semibold mb-2" style="color:#9CA3AF;">Para estabelecimentos</p>
-        <h2 class="text-3xl font-bold mb-8">Como Funciona</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-8">Como Funciona</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="img-card rounded-lg overflow-hidden relative" style="background:#1a1a1a;min-height:220px;">
@@ -454,11 +509,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {{-- ═══ TRANSFORME TALENTO ═══ --}}
 <section class="py-20 text-center" style="background:#111;">
-    <div class="max-w-6xl mx-auto px-6">
-        <h2 class="text-4xl md:text-5xl font-extrabold mb-4" style="color:#F59E0B;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <h2 class="text-3xl sm:text-4xl desktop:text-5xl font-extrabold mb-4" style="color:#F59E0B;">
             Transforme talento em oportunidade.
         </h2>
-        <p class="text-base mb-12" style="color:#9CA3AF;">
+        <p class="text-sm sm:text-base mb-12" style="color:#9CA3AF;">
             Com o GigMap, músicos e estabelecimentos se conectam de forma rápida, segura e profissional.
         </p>
 
@@ -475,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ['id' => 'photo-1415201364774-f6f0bb35f28f', 'alt' => 'Músico com violão',            'span' => ''],
         ];
         @endphp
-        <div class="grid grid-cols-4 auto-rows-[140px] gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 desktop:grid-cols-4 auto-rows-[100px] sm:auto-rows-[120px] desktop:auto-rows-[140px] gap-2 sm:gap-3">
             @foreach($mosaicPhotos as $photo)
             <div class="rounded-lg overflow-hidden relative group {{ $photo['span'] }}" style="background:#1a1a1a;">
                 <img src="https://images.unsplash.com/{{ $photo['id'] }}?w=600&q=75&auto=format&fit=crop&client_id=xH4ATu3SjujDCUpYxa2U3oz15S8y9It1kGknUDilYco"
@@ -493,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {{-- ═══ SOBRE + DIFICULDADES ═══ --}}
 <section id="sobre" class="py-20" style="background:#0e0e0e;">
-    <div class="max-w-6xl mx-auto px-6">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 
             {{-- Card shuffle stack --}}
@@ -651,17 +706,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 {{-- ═══ PROCESSO (TIMELINE) ═══ --}}
 <section class="py-20" style="background:#111;" id="processo">
-    <div class="max-w-4xl mx-auto px-6">
-        <h2 class="text-4xl font-bold text-center mb-4">Processo</h2>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-4">Processo</h2>
         <p class="text-center text-sm mb-16" style="color:#9CA3AF;">
             Do cadastro ao palco em poucos passos. Veja como é simples conectar talento e oportunidade.
         </p>
 
         <div class="relative" id="timeline-container">
             {{-- Background track --}}
-            <div class="absolute left-1/2 top-0 bottom-0 w-px" style="background:#2a2a2a;transform:translateX(-50%);"></div>
+            <div class="absolute left-4 sm:left-1/2 top-0 bottom-0 w-px" style="background:#2a2a2a;transform:translateX(-50%);"></div>
             {{-- Animated fill line --}}
-            <div class="absolute left-1/2 top-0 w-px" id="timeline-progress"
+            <div class="absolute left-4 sm:left-1/2 top-0 w-px" id="timeline-progress"
                  style="background:#F59E0B;transform:translateX(-50%);height:0;transition:height 0.3s ease;"></div>
 
             @php
@@ -694,27 +749,27 @@ document.addEventListener('DOMContentLoaded', function() {
             @endphp
 
             @foreach($steps as $i => $step)
-            <div class="timeline-step flex items-start mb-20 relative
-                {{ $step['side'] === 'right' ? 'flex-row-reverse' : '' }}"
+            <div class="timeline-step flex items-start mb-12 sm:mb-20 relative
+                {{ $step['side'] === 'right' ? 'sm:flex-row-reverse' : '' }}"
                  data-side="{{ $step['side'] }}"
                  style="opacity:0;transform:translateY(40px);transition:opacity 0.6s ease {{ $i * 0.15 }}s, transform 0.6s ease {{ $i * 0.15 }}s;">
 
                 {{-- Center dot with number --}}
-                <div class="absolute left-1/2 top-1 z-20 flex items-center justify-center"
+                <div class="absolute left-4 sm:left-1/2 top-1 z-20 flex items-center justify-center"
                      style="transform:translateX(-50%);">
-                    <div class="timeline-dot w-10 h-10 rounded-full flex items-center justify-center"
+                    <div class="timeline-dot w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center"
                          style="background:#1a1a1a;border:2px solid #2a2a2a;transition:border-color 0.4s ease, box-shadow 0.4s ease;">
                         <span class="text-xs font-bold" style="color:#F59E0B;">0{{ $i + 1 }}</span>
                     </div>
                 </div>
 
                 {{-- Content card --}}
-                <div class="w-5/12 {{ $step['side'] === 'right' ? 'pl-12' : 'pr-12 text-right' }}">
-                    <div class="timeline-card p-5 rounded-lg"
+                <div class="w-full pl-12 sm:pl-0 sm:w-5/12 {{ $step['side'] === 'right' ? 'sm:pl-12' : 'sm:pr-12 sm:text-right' }}">
+                    <div class="timeline-card p-4 sm:p-5 rounded-lg"
                          style="background:#1a1a1a;border:1px solid #2a2a2a;transition:border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;"
                          onmouseenter="this.style.borderColor='#F59E0B';this.style.boxShadow='0 8px 30px rgba(245,158,11,0.12)';this.style.transform='translateY(-3px)';"
                          onmouseleave="this.style.borderColor='#2a2a2a';this.style.boxShadow='none';this.style.transform='translateY(0)';">
-                        <div class="{{ $step['side'] === 'right' ? '' : 'flex flex-col items-end' }}">
+                        <div class="{{ $step['side'] === 'right' ? '' : 'sm:flex sm:flex-col sm:items-end' }}">
                             <div class="w-9 h-9 rounded-md flex items-center justify-center mb-3"
                                  style="background:rgba(245,158,11,0.1);">
                                 <svg class="w-5 h-5" style="color:#F59E0B;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -722,11 +777,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </svg>
                             </div>
                         </div>
-                        <h3 class="text-lg font-bold mb-2" style="color:#F59E0B;">{{ $step['title'] }}</h3>
+                        <h3 class="text-base sm:text-lg font-bold mb-2" style="color:#F59E0B;">{{ $step['title'] }}</h3>
                         <p class="text-sm leading-relaxed" style="color:#9CA3AF;">{{ $step['desc'] }}</p>
                     </div>
                 </div>
-                <div class="w-5/12"></div>
+                <div class="hidden sm:block sm:w-5/12"></div>
             </div>
             @endforeach
         </div>

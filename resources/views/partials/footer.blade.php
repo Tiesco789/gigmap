@@ -1,5 +1,5 @@
 <footer class="gig-footer mt-16">
-    <div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex-shrink-0">
@@ -7,7 +7,7 @@
             </a>
 
             {{-- Nav --}}
-            <div class="flex gap-6">
+            <div class="flex flex-wrap gap-4 sm:gap-6">
                 <a href="{{ route('announcements.index') }}" class="text-sm text-gray-300 hover:text-amber-400 transition-colors">Anúncios</a>
                 <a href="{{ route('home') }}#quem-somos" class="text-sm text-gray-300 hover:text-amber-400 transition-colors">Quem Somos</a>
                 <a href="{{ route('home') }}#sobre" class="text-sm text-gray-300 hover:text-amber-400 transition-colors">Sobre o Projeto</a>
@@ -32,7 +32,7 @@
     </div>
 
     <div class="border-t" style="border-color:#555;">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-center gap-4 text-xs" style="color:#999;">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row items-center justify-center gap-4 text-xs" style="color:#999;">
             <span>© {{ date('Y') }} Todos os direitos reservados</span>
             <span class="hidden md:inline">·</span>
             <a href="#" class="hover:text-amber-400 transition-colors" style="color:#F59E0B;">Políticas de privacidade</a>
