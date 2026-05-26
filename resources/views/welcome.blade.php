@@ -35,7 +35,7 @@
             @endauth
 
             {{-- Hamburger button --}}
-            <button class="hamburger-btn desktop:hidden" @click="mobileMenuOpen = !mobileMenuOpen" :aria-expanded="mobileMenuOpen.toString()" aria-label="Abrir menu">
+            <button class="hamburger-btn desktop:!hidden" @click="mobileMenuOpen = !mobileMenuOpen" :aria-expanded="mobileMenuOpen.toString()" aria-label="Abrir menu">
                 <span></span>
                 <span></span>
                 <span></span>

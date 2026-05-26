@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
 
 /* ── Custom Breakpoint: desktop 1366px ───────────────── */
 @theme {
@@ -24,6 +24,10 @@
         color: #F5F5DC;
         font-family: 'Merriweather', serif;
         min-height: 100vh;
+    }
+
+    html, body {
+          overflow-x: hidden;
     }
 
     h1,
