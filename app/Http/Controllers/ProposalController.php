@@ -134,13 +134,29 @@ class ProposalController extends Controller
     // ── Private helpers ──────────────────────────────
 
     /**
-     * Only the announcement owner can accept/reject proposals.
+     * Only the recipient of the proposal (who is in the chat and did not send it) can accept/reject.
      */
     private function authorizeProposalAction(Proposal $proposal): void
     {
-        $announcement = $proposal->announcement;
-        if (Auth::id() !== $announcement->user_id) {
-            abort(403, 'Você não tem permissão para responder a esta proposta.');
+        $userId = (int) Auth::id();
+        $chat = $proposal->chat;
+
+        if ($chat) {
+            // O usuário logado deve ser um dos participantes do chat
+            if ($userId !== (int) $chat->musician_id && $userId !== (int) $chat->establishment_id) {
+                abort(403, 'Você não tem permissão para responder a esta proposta.');
+            }
+
+            // O usuário logado deve ser o destinatário da proposta (não quem a enviou)
+            if ($userId === (int) $proposal->sender_id) {
+                abort(403, 'Você não pode responder à sua própria proposta.');
+            }
+        } else {
+            // Fallback para propostas legadas sem chat
+            $announcement = $proposal->announcement;
+            if (!$announcement || $userId !== (int) $announcement->user_id) {
+                abort(403, 'Você não tem permissão para responder a esta proposta.');
+            }
         }
     }
 

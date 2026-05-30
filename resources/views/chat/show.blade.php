@@ -118,7 +118,7 @@
                                  x-cloak>
                                 <button type="button" class="proposal-btn-accept"
                                         x-on:click="respondProposal(msg, 'accept')"
-                                        :disabled="msg._responding">
+                                        :disabled="!!msg._responding">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
@@ -126,7 +126,7 @@
                                 </button>
                                 <button type="button" class="proposal-btn-reject"
                                         x-on:click="respondProposal(msg, 'reject')"
-                                        :disabled="msg._responding">
+                                        :disabled="!!msg._responding">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -188,6 +188,11 @@ function chatApp() {
         echoConnected: false,
 
         init() {
+            // Garante que o estado _responding esteja inicializado como false
+            this.messages.forEach(m => {
+                m._responding = false;
+            });
+
             this.$nextTick(() => this.scrollToBottom());
 
             // Try Echo (Reverb WebSocket) first
@@ -200,6 +205,7 @@ function chatApp() {
                         // Avoid duplicating messages already in the list
                         if (this.messages.some(m => m.id === e.id)) return;
 
+                        e._responding = false;
                         this.messages.push(e);
                         this.$nextTick(() => this.scrollToBottom());
                     });
@@ -300,6 +306,7 @@ function chatApp() {
 
                         // Avoid duplicates
                         if (!this.messages.some(m => m.id === msg.id)) {
+                            msg._responding = false;
                             this.messages.push(msg);
                             hasNew = true;
                         }
