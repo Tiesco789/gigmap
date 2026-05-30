@@ -47,13 +47,103 @@
 
         {{-- Message bubbles --}}
         <template x-for="msg in messages" :key="msg.id">
-            <div class="chat-bubble-wrapper"
-                 :class="msg.sender_id == currentUserId ? 'sent' : 'received'">
-                <div class="chat-bubble"
-                     :class="msg.sender_id == currentUserId ? 'bubble-sent' : 'bubble-received'">
-                    <p class="chat-bubble-body" x-text="msg.body"></p>
-                    <span class="chat-bubble-time" x-text="msg.created_at"></span>
-                </div>
+            <div>
+                {{-- Regular text message --}}
+                <template x-if="msg.type !== 'proposal'">
+                    <div class="chat-bubble-wrapper"
+                         :class="msg.sender_id == currentUserId ? 'sent' : 'received'">
+                        <div class="chat-bubble"
+                             :class="msg.sender_id == currentUserId ? 'bubble-sent' : 'bubble-received'">
+                            <p class="chat-bubble-body" x-text="msg.body"></p>
+                            <span class="chat-bubble-time" x-text="msg.created_at"></span>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Proposal message card --}}
+                <template x-if="msg.type === 'proposal' && msg.proposal">
+                    <div class="proposal-card-wrapper">
+                        <div class="proposal-card"
+                             :class="{
+                                 'proposal-card-pending': msg.proposal.status === 'pending',
+                                 'proposal-card-accepted': msg.proposal.status === 'accepted',
+                                 'proposal-card-rejected': msg.proposal.status === 'rejected'
+                             }">
+                            {{-- Header --}}
+                            <div class="proposal-card-header">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span class="text-sm font-bold">Proposta</span>
+                                <span class="proposal-status-badge"
+                                      :class="{
+                                          'badge-pending': msg.proposal.status === 'pending',
+                                          'badge-accepted': msg.proposal.status === 'accepted',
+                                          'badge-rejected': msg.proposal.status === 'rejected'
+                                      }"
+                                      x-text="msg.proposal.status === 'pending' ? 'Pendente' : msg.proposal.status === 'accepted' ? 'Aceita ✓' : 'Recusada ✗'">
+                                </span>
+                            </div>
+
+                            {{-- Value --}}
+                            <div class="proposal-value" x-text="msg.proposal.formatted_value"></div>
+
+                            {{-- Meta --}}
+                            <div class="proposal-meta">
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#6B7280;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    <span x-text="msg.proposal.sender_name"></span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#6B7280;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span x-text="msg.created_at"></span>
+                                </div>
+                            </div>
+
+                            {{-- Announcement reference --}}
+                            <div class="proposal-announcement" x-show="msg.proposal.announcement_title" x-cloak>
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#6B7280;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                                </svg>
+                                <span class="text-xs truncate" x-text="msg.proposal.announcement_title" style="color:#9CA3AF;"></span>
+                            </div>
+
+                            {{-- Actions (only for the recipient when pending) --}}
+                            <div class="proposal-actions"
+                                 x-show="msg.proposal.status === 'pending' && msg.proposal.sender_id != currentUserId"
+                                 x-cloak>
+                                <button type="button" class="proposal-btn-accept"
+                                        x-on:click="respondProposal(msg, 'accept')"
+                                        :disabled="msg._responding">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Aceitar
+                                </button>
+                                <button type="button" class="proposal-btn-reject"
+                                        x-on:click="respondProposal(msg, 'reject')"
+                                        :disabled="msg._responding">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Recusar
+                                </button>
+                            </div>
+
+                            {{-- Waiting indicator for sender --}}
+                            <div class="proposal-waiting"
+                                 x-show="msg.proposal.status === 'pending' && msg.proposal.sender_id == currentUserId"
+                                 x-cloak>
+                                <div class="proposal-waiting-dot"></div>
+                                Aguardando resposta...
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </template>
     </div>
@@ -215,12 +305,71 @@ function chatApp() {
                         }
                     });
 
+                    // Also refresh proposal statuses in existing messages
+                    this.refreshProposalStatuses(newMessages);
+
                     if (hasNew) {
                         this.$nextTick(() => this.scrollToBottom());
                     }
                 }
             } catch (err) {
                 // Silently ignore polling errors
+            }
+        },
+
+        /**
+         * Update proposal statuses from polled messages (in case other user accepted/rejected).
+         */
+        refreshProposalStatuses(newMessages) {
+            // Check if any existing proposal messages need status updates
+            newMessages.forEach(newMsg => {
+                if (newMsg.type === 'proposal' && newMsg.proposal) {
+                    const existing = this.messages.find(m =>
+                        m.type === 'proposal' &&
+                        m.proposal &&
+                        m.proposal.id === newMsg.proposal.id
+                    );
+                    if (existing && existing.proposal.status !== newMsg.proposal.status) {
+                        existing.proposal.status = newMsg.proposal.status;
+                    }
+                }
+            });
+        },
+
+        /**
+         * Handle Accept / Reject proposal via AJAX.
+         */
+        async respondProposal(msg, action) {
+            if (msg._responding) return;
+            msg._responding = true;
+
+            const url = action === 'accept'
+                ? msg.proposal.accept_url
+                : msg.proposal.reject_url;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Update the proposal status optimistically
+                    msg.proposal.status = data.status;
+                } else {
+                    const errData = await response.json().catch(() => ({}));
+                    alert(errData.message || 'Erro ao processar proposta.');
+                }
+            } catch (err) {
+                alert('Erro de conexão. Tente novamente.');
+            } finally {
+                msg._responding = false;
             }
         },
 
@@ -237,6 +386,7 @@ function chatApp() {
                 chat_id: this.chatId,
                 sender_id: this.currentUserId,
                 body: body,
+                type: 'text',
                 created_at: this.getBrasiliaTime(),
             };
             this.messages.push(optimisticMsg);

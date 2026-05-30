@@ -88,6 +88,8 @@ Route::middleware('auth')->group(function () {
 
     // Proposals
     Route::post('/anuncios/{announcement}/proposta', [ProposalController::class, 'store'])->name('proposals.store');
+    Route::post('/propostas/{proposal}/aceitar', [ProposalController::class, 'accept'])->name('proposals.accept');
+    Route::post('/propostas/{proposal}/recusar', [ProposalController::class, 'reject'])->name('proposals.reject');
 });
 
 // Notifications (auth required)

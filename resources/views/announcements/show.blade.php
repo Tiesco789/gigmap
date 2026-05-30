@@ -129,15 +129,42 @@
         {{-- Proposal form (takes 2 columns) --}}
         <div class="md:col-span-2 p-6 rounded-lg" style="background:#1a1a1a;border:1px solid #2a2a2a;">
             <h3 class="text-lg font-bold mb-3" style="color:#F59E0B;">Enviar Proposta</h3>
-            <form method="POST" action="{{ route('proposals.store', $announcement) }}">
+            <form method="POST" action="{{ route('proposals.store', $announcement) }}" id="proposalForm">
                 @csrf
+
+                {{-- Monetary value input --}}
                 <div class="mb-4">
-                    <textarea name="message" rows="4" maxlength="1000"
-                        placeholder="Descreva sua proposta, disponibilidade, repertório..."
-                        class="input-subtle resize-none w-full">{{ old('message') }}</textarea>
-                    @error('message')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
+                    <label for="proposalValue" class="block text-xs font-semibold mb-2" style="color:#9CA3AF;">Valor da Proposta</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold" style="color:#F59E0B;" id="currencyPrefix">R$</span>
+                        <input type="text"
+                               name="value"
+                               id="proposalValue"
+                               placeholder="0,00"
+                               class="input-monetary"
+                               autocomplete="off"
+                               inputmode="decimal"
+                               value="{{ old('value') }}">
+                    </div>
+                    @error('value')<p class="text-red-400 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
-                <button type="submit" class="btn-primary">
+
+                {{-- Negotiate checkbox --}}
+                <div class="mb-5">
+                    <label class="flex items-center gap-2.5 cursor-pointer group">
+                        <input type="checkbox"
+                               name="negotiate"
+                               value="1"
+                               id="negotiateCheck"
+                               class="w-4 h-4 rounded accent-amber-500 cursor-pointer"
+                               {{ old('negotiate') ? 'checked' : '' }}>
+                        <span class="text-sm group-hover:text-amber-400 transition-colors" style="color:#d1d5db;">
+                            Prefiro negociar o valor
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-primary" id="proposalSubmitBtn">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                     </svg>
@@ -176,4 +203,85 @@
     @endif
 
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const valueInput = document.getElementById('proposalValue');
+    const negotiateCheck = document.getElementById('negotiateCheck');
+    const currencyPrefix = document.getElementById('currencyPrefix');
+    const form = document.getElementById('proposalForm');
+
+    if (!valueInput || !negotiateCheck) return;
+
+    // ── Currency mask (Brazilian format: 1.234,56) ───
+    function formatCurrency(value) {
+        // Remove everything except digits
+        let digits = value.replace(/\D/g, '');
+        if (digits === '') return '';
+        // Convert to number (cents)
+        let num = parseInt(digits, 10);
+        // Format as Brazilian currency
+        let formatted = (num / 100).toFixed(2)
+            .replace('.', ',')
+            .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return formatted;
+    }
+
+    function parseCurrencyToFloat(value) {
+        if (!value) return 0;
+        // Remove dots (thousands), replace comma with dot (decimal)
+        return parseFloat(value.replace(/\./g, '').replace(',', '.')) || 0;
+    }
+
+    valueInput.addEventListener('input', () => {
+        let pos = valueInput.selectionStart;
+        let oldLen = valueInput.value.length;
+        valueInput.value = formatCurrency(valueInput.value);
+        let newLen = valueInput.value.length;
+        // Adjust cursor
+        valueInput.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+    });
+
+    // ── Negotiate toggle ───
+    function toggleNegotiate() {
+        if (negotiateCheck.checked) {
+            valueInput.disabled = true;
+            valueInput.value = '';
+            valueInput.style.opacity = '0.4';
+            currencyPrefix.style.opacity = '0.4';
+        } else {
+            valueInput.disabled = false;
+            valueInput.style.opacity = '1';
+            currencyPrefix.style.opacity = '1';
+            valueInput.focus();
+        }
+    }
+
+    negotiateCheck.addEventListener('change', toggleNegotiate);
+    toggleNegotiate(); // Initial state
+
+    // ── Form validation ───
+    form.addEventListener('submit', (e) => {
+        if (negotiateCheck.checked) return; // Allow negotiate
+
+        const val = parseCurrencyToFloat(valueInput.value);
+        if (val <= 0) {
+            e.preventDefault();
+            valueInput.style.borderColor = '#ef4444';
+            valueInput.focus();
+            setTimeout(() => { valueInput.style.borderColor = ''; }, 2000);
+        } else {
+            // Convert to server-friendly format before submit
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'value';
+            hiddenInput.value = val;
+            form.appendChild(hiddenInput);
+            valueInput.name = ''; // Prevent duplicate
+        }
+    });
+});
+</script>
+@endpush
 @endsection

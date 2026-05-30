@@ -12,6 +12,8 @@ class Message extends Model
         'chat_id',
         'sender_id',
         'body',
+        'type',
+        'proposal_id',
         'read_at',
     ];
 
@@ -32,6 +34,21 @@ class Message extends Model
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function proposal(): BelongsTo
+    {
+        return $this->belongsTo(Proposal::class);
+    }
+
+    // ── Helpers ───────────────────────────────────────
+
+    /**
+     * Check if this message is a proposal card.
+     */
+    public function isProposal(): bool
+    {
+        return $this->type === 'proposal';
     }
 
     // ── Scopes ────────────────────────────────────────

@@ -1046,4 +1046,274 @@
     .chat-bubble-wrapper {
         max-width: 85%;
     }
+
+    .proposal-card {
+        max-width: 100% !important;
+    }
+
+    .proposal-actions {
+        flex-direction: column;
+    }
+}
+
+/* ============================================================
+   Proposal System
+   ============================================================ */
+
+/* ── Proposal Card in Chat ──────────────────────────── */
+.proposal-card-wrapper {
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+    padding: 0.5rem 0;
+    animation: fadeInUp 0.35s ease both;
+}
+
+.proposal-card {
+    width: 100%;
+    max-width: 380px;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.proposal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+/* ── Pending state ──────────────────────────────────── */
+.proposal-card-pending {
+    background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(217,119,6,0.04));
+    border: 1.5px solid rgba(245,158,11,0.3);
+    animation: proposalPulse 3s ease-in-out infinite;
+}
+
+.proposal-card-pending::before {
+    background: linear-gradient(90deg, #F59E0B, #D97706, #F59E0B);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+}
+
+@keyframes proposalPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+    50% { box-shadow: 0 0 20px 2px rgba(245,158,11,0.1); }
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── Accepted state ─────────────────────────────────── */
+.proposal-card-accepted {
+    background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(22,163,74,0.04));
+    border: 1.5px solid rgba(34,197,94,0.3);
+}
+
+.proposal-card-accepted::before {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+/* ── Rejected state ─────────────────────────────────── */
+.proposal-card-rejected {
+    background: linear-gradient(135deg, rgba(239,68,68,0.06), rgba(220,38,38,0.03));
+    border: 1.5px solid rgba(239,68,68,0.2);
+    opacity: 0.7;
+}
+
+.proposal-card-rejected::before {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+/* ── Card inner elements ────────────────────────────── */
+.proposal-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+    color: #F59E0B;
+}
+
+.proposal-card-accepted .proposal-card-header {
+    color: #22c55e;
+}
+
+.proposal-card-rejected .proposal-card-header {
+    color: #ef4444;
+}
+
+.proposal-status-badge {
+    margin-left: auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.badge-pending {
+    background: rgba(245,158,11,0.15);
+    color: #F59E0B;
+}
+
+.badge-accepted {
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+}
+
+.badge-rejected {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+}
+
+.proposal-value {
+    font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #F5F5DC;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+}
+
+.proposal-card-accepted .proposal-value {
+    color: #86efac;
+}
+
+.proposal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    margin-bottom: 0.5rem;
+}
+
+.proposal-announcement {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: #6B7280;
+    margin-bottom: 0.875rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ── Action Buttons ─────────────────────────────────── */
+.proposal-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.875rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.proposal-btn-accept,
+.proposal-btn-reject {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Merriweather', serif;
+}
+
+.proposal-btn-accept {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+}
+
+.proposal-btn-accept:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(34,197,94,0.4);
+}
+
+.proposal-btn-reject {
+    background: transparent;
+    color: #ef4444;
+    border: 1.5px solid rgba(239,68,68,0.4);
+}
+
+.proposal-btn-reject:hover:not(:disabled) {
+    background: rgba(239,68,68,0.08);
+    border-color: #ef4444;
+    transform: translateY(-1px);
+}
+
+.proposal-btn-accept:disabled,
+.proposal-btn-reject:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ── Waiting indicator ──────────────────────────────── */
+.proposal-waiting {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #F59E0B;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.proposal-waiting-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #F59E0B;
+    animation: waitingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes waitingPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ── Monetary Input (Announcement page) ─────────────── */
+.input-monetary {
+    width: 100%;
+    padding: 0.75rem 0.875rem 0.75rem 2.5rem;
+    background-color: #1a1a1a;
+    color: #F5F5DC;
+    border: 1.5px solid #333333;
+    border-radius: 0.375rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    letter-spacing: 0.5px;
+}
+
+.input-monetary::placeholder {
+    color: #4a4a4a;
+    font-weight: 400;
+}
+
+.input-monetary:focus {
+    border-color: #F59E0B;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+}
+
+.input-monetary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }

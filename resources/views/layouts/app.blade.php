@@ -271,34 +271,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 list.innerHTML = data.notifications.map(n => {
                     const isUnread = !n.read_at;
                     const d = n.data;
+                    const nType = d.type || 'new_proposal';
+
+                    let title = '';
+                    let body = '';
+                    let icon = '';
+                    let redirectUrl = null;
+
+                    if (nType === 'new_proposal') {
+                        icon = '📋';
+                        title = d.sender_name;
+                        body = `Enviou uma proposta de <strong>${d.value || 'A negociar'}</strong> para <strong>${d.announcement_title}</strong>`;
+                        if (d.chat_id) {
+                            redirectUrl = `/chat/${d.chat_id}`;
+                        }
+                    } else if (nType === 'proposal_accepted') {
+                        icon = '✅';
+                        title = 'Proposta Aceita!';
+                        body = `<strong>${d.responder_name}</strong> aceitou sua proposta de <strong>${d.value}</strong> para <strong>${d.announcement_title}</strong>`;
+                        if (d.chat_id) {
+                            redirectUrl = `/chat/${d.chat_id}`;
+                        }
+                    } else if (nType === 'proposal_rejected') {
+                        icon = '❌';
+                        title = 'Proposta Recusada';
+                        body = `<strong>${d.responder_name}</strong> recusou sua proposta de <strong>${d.value}</strong> para <strong>${d.announcement_title}</strong>`;
+                        // Sem redirecionamento automático
+                        redirectUrl = null;
+                    } else {
+                        // Fallback for legacy notifications
+                        icon = '🔔';
+                        title = d.sender_name || 'Notificação';
+                        body = d.message || 'Nova notificação';
+                        if (d.announcement_id) {
+                            redirectUrl = `/anuncios/${d.announcement_id}`;
+                        }
+                    }
+
                     return `
                         <div class="px-4 py-3 cursor-pointer transition-colors hover:bg-white/5 ${isUnread ? '' : 'opacity-60'}"
                             style="border-bottom:1px solid #2a2a2a;"
                             data-notification-id="${n.id}"
+                            data-redirect-url="${redirectUrl || ''}"
                             ${isUnread ? 'data-unread="true"' : ''}>
-                            <p class="text-sm font-semibold mb-0.5" style="color:#F59E0B;">${d.sender_name}</p>
-                            <p class="text-xs mb-1" style="color:#d1d5db;">
-                                Enviou uma proposta para <strong>${d.announcement_title}</strong>
-                            </p>
-                            ${d.message ? `<p class="text-xs line-clamp-2" style="color:#9CA3AF;">"${d.message}"</p>` : ''}
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-base">${icon}</span>
+                                <p class="text-sm font-semibold" style="color:#F59E0B;">${title}</p>
+                            </div>
+                            <p class="text-xs mb-1" style="color:#d1d5db;">${body}</p>
                             <p class="text-xs mt-1" style="color:#666;">${n.time_ago}</p>
                         </div>
                     `;
                 }).join('');
 
-                // Click on notification → mark as read & go to announcement
+                // Click on notification → mark as read & redirect
                 list.querySelectorAll('[data-notification-id]').forEach(el => {
                     el.addEventListener('click', () => {
                         const id = el.dataset.notificationId;
-                        const announcementId = data.notifications.find(n => n.id === id)?.data.announcement_id;
+                        const redirectUrl = el.dataset.redirectUrl;
+
                         if (el.dataset.unread) {
                             fetch(`/notificacoes/${id}/lida`, {
                                 method: 'POST',
                                 headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
                             });
                         }
-                        if (announcementId) {
-                            window.location.href = `/anuncios/${announcementId}`;
+
+                        if (redirectUrl) {
+                            window.location.href = redirectUrl;
                         }
                     });
                 });

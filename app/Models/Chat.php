@@ -45,6 +45,11 @@ class Chat extends Model
         return $this->hasOne(Message::class)->latestOfMany();
     }
 
+    public function proposals(): HasMany
+    {
+        return $this->hasMany(Proposal::class);
+    }
+
     // ── Scopes ────────────────────────────────────────
 
     /**

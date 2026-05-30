@@ -6,7 +6,7 @@ use App\Models\Proposal;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class NewProposalNotification extends Notification
+class ProposalAcceptedNotification extends Notification
 {
     use Queueable;
 
@@ -22,14 +22,13 @@ class NewProposalNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type'               => 'new_proposal',
+            'type'               => 'proposal_accepted',
             'proposal_id'        => $this->proposal->id,
             'announcement_id'    => $this->proposal->announcement_id,
             'announcement_title' => $this->proposal->announcement->title,
             'chat_id'            => $this->proposal->chat_id,
-            'sender_name'        => $this->proposal->sender->getDisplayName(),
+            'responder_name'     => $this->proposal->announcement->user->getDisplayName(),
             'value'              => $this->proposal->getFormattedValue(),
-            'message'            => $this->proposal->message,
         ];
     }
 }
